@@ -17,7 +17,9 @@ export default function Main() {
           <Environment preset="studio" />
         </Canvas>
       </div>
-
+      <div className="flex items-end justify-center min-h-screen">
+        <h1 className="text-white font-bold text-4xl uppercase p-5">Convrse AI</h1>
+      </div>
       {/* Scroll space */}
       <div style={{ height: "500vh" }} />
     </>
