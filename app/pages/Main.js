@@ -80,7 +80,6 @@ export default function Main() {
         </Canvas>
       </div>
 
-      {/* Mouse Trail Layer */}
       {/* <div
         style={{
           position: "fixed",
