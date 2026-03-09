@@ -58,7 +58,7 @@ export default function Wire() {
 
     ref.current.position.y = -4.7 + eased * 3
 
-    ref.current.rotation.y = eased * Math.PI * 1.4
+    ref.current.rotation.y = eased * Math.PI * 1.45
 
   })
 
@@ -67,7 +67,7 @@ export default function Wire() {
       ref={ref}
       object={scene}
       scale={0.5}
-      position={[0, -3, 0]}
+      position={[0.03, -3, 0.08]}
     />
   )
 }

@@ -3,8 +3,8 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, OrbitControls, useVideoTexture } from "@react-three/drei";
 import Model from "../components/Model";
-import { MouseOverlay } from "../components/Effects";
-import { Bloom, EffectComposer } from "@react-three/postprocessing";
+// import { MouseOverlay } from "../components/Effects";
+// import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import Wire from "../components/Wire";
 import { useRef } from "react";
 import * as THREE from "three";
@@ -33,7 +33,7 @@ function VideoEnv() {
     <Environment
       map={texture}
       background={false}
-      blur={2}   // strong blur for reflection
+      blur={2}   
     />
   )
 }
