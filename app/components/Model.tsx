@@ -39,7 +39,7 @@ export default function Model(props: any) {
   // Scroll rotation
   useEffect(() => {
     const handleScroll = () => {
-      targetRotation.current = window.scrollY * 0.0005;
+      targetRotation.current = window.scrollY * 0;
     };
 
     window.addEventListener("scroll", handleScroll);

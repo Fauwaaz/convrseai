@@ -2,16 +2,20 @@
 
 import { useGLTF, useEnvironment } from "@react-three/drei"
 import { useFrame } from "@react-three/fiber"
-import { useRef, useLayoutEffect } from "react"
+import { useRef, useLayoutEffect, useEffect } from "react"
 import * as THREE from "three"
 
 export default function Wire() {
 
   const { scene } = useGLTF("/models/wires.glb")
   const env = useEnvironment({ preset: "city" })
+  const targetRotation = useRef(0);
+
 
   const ref = useRef<THREE.Group>(null!)
   const progress = useRef(0)
+
+
 
   useLayoutEffect(() => {
 
@@ -61,6 +65,8 @@ export default function Wire() {
     ref.current.rotation.y = eased * Math.PI * 1.45
 
   })
+
+
 
   return (
     <primitive

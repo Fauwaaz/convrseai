@@ -33,7 +33,7 @@ function VideoEnv() {
     <Environment
       map={texture}
       background={false}
-      blur={2}   
+      blur={2}
     />
   )
 }
@@ -49,6 +49,7 @@ export default function Main() {
           zIndex: 5,
           pointerEvents: "auto"
         }}
+        className="glow-bg"
       >
         <Canvas
           camera={{ position: [0, 0, 5], fov: 40 }}
@@ -101,7 +102,19 @@ export default function Main() {
         </Canvas>
       </div> */}
 
-      <div style={{ height: "400vh" }} />
+      <div style={{ height: "200vh" }} />
+      <div className="flex min-h-screen items-center justify-center z-5 relative">
+        <div className="flex justify-center items-end gap-7 max-w-5xl">
+          <h1 className="text-white text-8xl font-crystal-regular">CREATIVE DIGITAL EXPERIENCES</h1>
+          <p className="text-sm text-gray-200 mt-5 uppercase font-crystal-regular">Founded in 2012
+            <br />
+            <br />
+            We blend story, art & technology as an in-house team of passionate makers
+            <br />
+            <br />
+            Our industry-leading web toolset consistently delivers award-winning work through quality & performance</p>
+        </div>
+      </div>
     </>
   );
 }
