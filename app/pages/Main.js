@@ -10,6 +10,11 @@ import { useRef } from "react";
 import * as THREE from "three";
 
 
+import Scene1 from "../components/Scenes/Scene1";
+import Grass from "../components/Scenes/assets/Grass";
+import { Bloom, EffectComposer } from "@react-three/postprocessing";
+
+
 function LogoGroup({ children }) {
 
   const ref = useRef()
@@ -23,24 +28,15 @@ function LogoGroup({ children }) {
   return <group ref={ref}>{children}</group>
 }
 
-function VideoEnv() {
-
-  const texture = useVideoTexture("/video/reel.mp4")
-
-  texture.mapping = THREE.EquirectangularReflectionMapping
-
-  return (
-    <Environment
-      map={texture}
-      background={false}
-      blur={2}
-    />
-  )
-}
-
 export default function Main() {
   return (
     <>
+
+      <div className="projector-layer">
+        <video autoPlay loop muted playsInline>
+          <source src="/video/reel.mp4" type="video/mp4" />
+        </video>
+      </div>
       {/* 3D Model Layer */}
       <div
         style={{
@@ -54,14 +50,40 @@ export default function Main() {
         <Canvas
           camera={{ position: [0, 0, 5], fov: 40 }}
           gl={{ alpha: true }}
+          shadows
           style={{ background: "transparent" }}
           onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
         >
+          <ambientLight intensity={0.35} />
 
-          <ambientLight intensity={0.5} />
-          <directionalLight position={[5, 10, 5]} intensity={2} />
+          <directionalLight
+            position={[6, 10, 4]}
+            intensity={2.5}
+            castShadow
+            shadow-mapSize-width={2048}
+            shadow-mapSize-height={2048}
+          />
+
+          <directionalLight
+            position={[-5, 4, -2]}
+            intensity={0.5}
+          />
+
+          <directionalLight
+            position={[3, 4, 2]}
+            intensity={1.5}
+          />
+
+          <directionalLight
+            position={[-3, 2, -2]}
+            intensity={0.8}
+          />
+
 
           <LogoGroup>
+            {/* <Grass /> */}
+
+            {/* <Scene1 /> */}
 
             <Wire />
 
@@ -77,7 +99,16 @@ export default function Main() {
             makeDefault
           />
 
-          <VideoEnv />
+          <Environment preset="city" />
+
+
+          <EffectComposer>
+            <Bloom
+              intensity={0.01}
+              luminanceThreshold={0.01}
+              luminanceSmoothing={0.9}
+            />
+          </EffectComposer>
         </Canvas>
       </div>
 

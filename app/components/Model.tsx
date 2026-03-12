@@ -4,6 +4,7 @@ import { useGLTF } from "@react-three/drei";
 import { useLayoutEffect, useRef, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import { MeshTransmissionMaterial } from "@react-three/drei"
 
 export default function Model(props: any) {
   const { scene } = useGLTF("/models/logo/Convrse_v1.glb");
@@ -14,19 +15,18 @@ export default function Model(props: any) {
   const introProgress = useRef(0);
   const introDone = useRef(false);
 
-  // Apply material + center
   useLayoutEffect(() => {
     scene.traverse((child: any) => {
       if (child.isMesh) {
         child.material = new THREE.MeshPhysicalMaterial({
-          color: "#ffffff",
           transmission: 1,
+          thickness: 2,
           roughness: 0,
           metalness: 0,
-          thickness: 1.5,
           ior: 1.5,
           clearcoat: 1,
-        });
+          reflectivity: 1,
+        })
         child.material.side = THREE.DoubleSide;
       }
     });
@@ -36,7 +36,6 @@ export default function Model(props: any) {
     scene.position.sub(center);
   }, [scene]);
 
-  // Scroll rotation
   useEffect(() => {
     const handleScroll = () => {
       targetRotation.current = window.scrollY * 0;
@@ -48,14 +47,11 @@ export default function Model(props: any) {
 
   useFrame((_, delta) => {
     if (!group.current) return;
-
-    // 🚀 Entrance Animation
     if (!introDone.current) {
       introProgress.current += delta * 0.4;
 
       const t = Math.min(introProgress.current, 1);
-      const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic
-
+      const eased = 1 - Math.pow(1 - t, 3);
       group.current.rotation.y = THREE.MathUtils.degToRad(160) * (1 - eased);
       group.current.scale.setScalar(100 - (100 - 9.5) * eased);
 
@@ -65,8 +61,6 @@ export default function Model(props: any) {
 
       return;
     }
-
-    // 🎯 After intro → scroll rotation
     group.current.rotation.y = THREE.MathUtils.lerp(
       group.current.rotation.y,
       targetRotation.current,
