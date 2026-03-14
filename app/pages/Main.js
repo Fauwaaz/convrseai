@@ -11,8 +11,9 @@ import * as THREE from "three";
 
 
 import Scene1 from "../components/Scenes/Scene1";
-import Grass from "../components/Scenes/assets/Grass";
+import GrassAndTrees from "../components/Scenes/assets/GrassAndTrees";
 import { Bloom, EffectComposer } from "@react-three/postprocessing";
+import Scene2 from "../components/Scenes/Scene2";
 
 
 function LogoGroup({ children }) {
@@ -31,12 +32,12 @@ function LogoGroup({ children }) {
 export default function Main() {
   return (
     <>
-
+{/* 
       <div className="projector-layer">
         <video autoPlay loop muted playsInline>
           <source src="/video/reel.mp4" type="video/mp4" />
         </video>
-      </div>
+      </div> */}
       {/* 3D Model Layer */}
       <div
         style={{
@@ -79,15 +80,16 @@ export default function Main() {
             intensity={0.8}
           />
 
+          <fog attach="fog" args={["#07131b", 5, 35]} />
 
           <LogoGroup>
-            {/* <Grass /> */}
+            {/* <GrassAndTrees /> */}
 
             {/* <Scene1 /> */}
 
+            <Model rotation={[0, Math.PI, 0]} scale={9.5} />
             <Wire />
 
-            <Model rotation={[0, Math.PI, 0]} scale={9.5} />
 
           </LogoGroup>
 
@@ -134,18 +136,7 @@ export default function Main() {
       </div> */}
 
       <div style={{ height: "200vh" }} />
-      <div className="flex min-h-screen items-center justify-center z-5 relative">
-        <div className="flex justify-center items-end gap-7 max-w-5xl">
-          <h1 className="text-white text-8xl font-crystal-regular">CREATIVE DIGITAL EXPERIENCES</h1>
-          <p className="text-sm text-gray-200 mt-5 uppercase font-crystal-regular">Founded in 2012
-            <br />
-            <br />
-            We blend story, art & technology as an in-house team of passionate makers
-            <br />
-            <br />
-            Our industry-leading web toolset consistently delivers award-winning work through quality & performance</p>
-        </div>
-      </div>
+      <Scene2 />
     </>
   );
 }

@@ -57,7 +57,7 @@ body {
 .projector-layer {
   position: fixed;
   inset: 0;
-  z-index: 1;
+  z-index: 10;
   pointer-events: none;
 
   display: flex;
@@ -72,53 +72,121 @@ body {
   object-fit: cover;
 
   filter:
-    blur(0px)
-    brightness(0.65)
-    contrast(1.25)
-    saturate(1.2);
+    blur(0px) brightness(0.65) contrast(1.25) saturate(1.2);
 
   transform: scale(1.4);
 
   opacity: 10;
 
-  mask-image: radial-gradient(
-    ellipse 55% 35% at center,
-    rgba(0,0,0,1) 0%,
-    rgba(0,0,0,0.9) 25%,
-    rgba(0,0,0,0.5) 45%,
-    rgba(0,0,0,0.15) 65%,
-    rgba(0,0,0,0) 80%
-  );
+  mask-image: radial-gradient(ellipse 55% 35% at center,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.9) 25%,
+      rgba(0, 0, 0, 0.5) 45%,
+      rgba(0, 0, 0, 0.15) 65%,
+      rgba(0, 0, 0, 0) 80%);
 
-  -webkit-mask-image: radial-gradient(
-    ellipse 55% 35% at center,
-    rgba(0,0,0,1) 0%,
-    rgba(0,0,0,0.9) 25%,
-    rgba(0,0,0,0.5) 45%,
-    rgba(0,0,0,0.15) 65%,
-    rgba(0,0,0,0) 80%
-  );
+  -webkit-mask-image: radial-gradient(ellipse 55% 35% at center,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.9) 25%,
+      rgba(0, 0, 0, 0.5) 45%,
+      rgba(0, 0, 0, 0.15) 65%,
+      rgba(0, 0, 0, 0) 80%);
 }
 
-/* .projector-layer::after {
+.projector-layer::after {
   content: "";
   position: absolute;
   inset: 0;
 
   background:
-    radial-gradient(
-      ellipse 70% 50% at center,
+    radial-gradient(ellipse 70% 50% at center,
       transparent 0%,
       transparent 40%,
-      rgba(0,0,0,0.4) 65%,
-      rgba(0,0,0,0.9) 100%
-    );
+      rgba(0, 0, 0, 0.4) 65%,
+      rgba(0, 0, 0, 0.9) 100%);
 
   pointer-events: none;
-} */
+}
 
 canvas {
   position: fixed;
   inset: 0;
   z-index: 5;
+}
+
+.scene2-root {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  backdrop-filter: blur(180px);
+}
+
+/* center brightness mask */
+.scene2-root::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background: radial-gradient(circle at center,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0) 40%,
+      rgba(0, 0, 0, 0.35) 70%,
+      rgba(0, 0, 0, 0.7) 100%);
+
+  pointer-events: none;
+}
+
+
+.scene2-panel {
+
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  position: relative;
+}
+
+.scene2-inner {
+
+  width: 100%;
+  max-width: 1400px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 80px;
+}
+
+.scene2-title {
+
+  font-family: var(--font-crystal), sans-serif;
+
+  font-size: clamp(80px, 9vw, 100px);
+  line-height: 0.9;
+
+  color: #fff;
+
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.4),
+    0 0 25px rgba(255, 255, 255, 0.25);
+
+}
+
+.scene2-text {
+
+  width: 260px;
+
+  font-size: 12px;
+  color: #ffffff;
+
+  text-transform: uppercase;
+  line-height: 1.8;
+
 }

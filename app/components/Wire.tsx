@@ -42,8 +42,10 @@ export default function Wire() {
 
           transmission: 0.15,
           thickness: 0.5,
-
         })
+        child.renderOrder = 1
+        child.material.depthWrite = true
+        child.material.depthTest = true
 
       }
 

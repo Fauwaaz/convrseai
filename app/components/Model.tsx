@@ -28,6 +28,9 @@ export default function Model(props: any) {
           reflectivity: 1,
         })
         child.material.side = THREE.DoubleSide;
+        child.renderOrder = 10
+        child.material.depthTest = true
+        child.material.depthWrite = true
       }
     });
 
