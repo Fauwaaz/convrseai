@@ -190,3 +190,12 @@ canvas {
   line-height: 1.8;
 
 }
+
+.scene2-canvas {
+  position: absolute;
+  inset: 0;
+  transform: translateY(20%);
+  height: 100%;
+  width: 100%;
+  z-index: 2;
+}

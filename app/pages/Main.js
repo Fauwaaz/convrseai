@@ -11,22 +11,23 @@ import * as THREE from "three";
 
 
 import Scene1 from "../components/Scenes/Scene1";
-import GrassAndTrees from "../components/Scenes/assets/GrassAndTrees";
+import Grass from "../components/Scenes/assets/Grass";
 import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import Scene2 from "../components/Scenes/Scene2";
+import Tree from "../components/Scenes/assets/Tree";
 
+function ScrollController({ children }) {
+  const group = useRef()
 
-function LogoGroup({ children }) {
-
-  const ref = useRef()
-
-  useFrame((state) => {
+  useFrame(() => {
     const scroll = window.scrollY / window.innerHeight
 
-    ref.current.rotation.y = scroll * Math.PI * 0.5
+    if (group.current) {
+      group.current.rotation.y = scroll * Math.PI * 0.5
+    }
   })
 
-  return <group ref={ref}>{children}</group>
+  return <group ref={group}>{children}</group>
 }
 
 export default function Main() {
@@ -82,16 +83,17 @@ export default function Main() {
 
           <fog attach="fog" args={["#07131b", 5, 35]} />
 
-          <LogoGroup>
-            {/* <GrassAndTrees /> */}
-
+          <ScrollController>
             {/* <Scene1 /> */}
+
+            <Grass />
+            {/* <Tree /> */}
 
             <Model rotation={[0, Math.PI, 0]} scale={9.5} />
             <Wire />
 
 
-          </LogoGroup>
+          </ScrollController>
 
           <OrbitControls
             enableZoom={false}
@@ -135,7 +137,7 @@ export default function Main() {
         </Canvas>
       </div> */}
 
-      <div style={{ height: "200vh" }} />
+      <div style={{ height: "400vh" }} />
       <Scene2 />
     </>
   );
