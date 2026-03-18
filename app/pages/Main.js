@@ -139,6 +139,8 @@ export default function Main() {
 
       <div style={{ height: "400vh" }} />
       <Scene2 />
+      <div style={{ height: "400vh" }} />
+
     </>
   );
 }
