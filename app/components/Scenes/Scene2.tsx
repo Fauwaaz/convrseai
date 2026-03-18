@@ -27,12 +27,9 @@ function LogoMesh() {
 
   const group = useRef<THREE.Group>(null!)
   const targetRotation = useRef(0)
-  const introProgress = useRef(0)
-  const introDone = useRef(false)
 
   useEffect(() => {
     scene.traverse((child) => {
-      // ✅ Fix 1: cast to Mesh, use lowercase .material
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh
         mesh.material = new THREE.MeshStandardMaterial({
@@ -52,18 +49,8 @@ function LogoMesh() {
     scene.scale.setScalar(scale)
   }, [scene])
 
-  useFrame((_, delta) => {
+  useFrame(() => {
     if (!group.current) return
-
-    if (!introDone.current) {
-      introProgress.current += delta * 0.4
-      const t = Math.min(introProgress.current, 1)
-      const eased = 1 - Math.pow(1 - t, 3)
-      group.current.rotation.y = THREE.MathUtils.degToRad(160) * (1 - eased)
-      group.current.scale.setScalar(100 - (100 - 9.5) * eased)
-      if (t >= 1) introDone.current = true
-      return
-    }
 
     group.current.rotation.y = THREE.MathUtils.lerp(
       group.current.rotation.y,
@@ -72,7 +59,6 @@ function LogoMesh() {
     )
   })
 
-  // ✅ Fix 2: wrap primitive in <group ref={group}> so the ref is actually attached
   return (
     <group ref={group}>
       <primitive object={scene} />
@@ -95,7 +81,7 @@ export default function Scene2() {
           </h1>
 
           <div className="scene2-canvas">
-            <Canvas camera={{ position: [102, 0, 0], fov: 14 }}>
+            <Canvas camera={{ position: [0, 0, 5], fov: 30 }}>
               <ambientLight intensity={0.8} />
 
               <directionalLight position={[12, 5, 5]} intensity={50} />
