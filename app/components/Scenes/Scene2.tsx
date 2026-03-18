@@ -81,7 +81,7 @@ export default function Scene2() {
           </h1>
 
           <div className="scene2-canvas">
-            <Canvas camera={{ position: [0, 0, 5], fov: 30 }}>
+            <Canvas camera={{ position: [0, 5, 0], fov: 30 }}>
               <ambientLight intensity={0.8} />
 
               <directionalLight position={[12, 5, 5]} intensity={50} />
