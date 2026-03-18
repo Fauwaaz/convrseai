@@ -101,6 +101,8 @@ export default function Scene2() {
                 makeDefault
               />
 
+              <Environment preset="sunset" />
+
               <EffectComposer>
                 <Bloom intensity={0.005} luminanceThreshold={0.1} />
               </EffectComposer>

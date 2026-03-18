@@ -33,18 +33,18 @@ function ScrollController({ children }) {
 export default function Main() {
   return (
     <>
-{/* 
+      
       <div className="projector-layer">
         <video autoPlay loop muted playsInline>
           <source src="/video/reel.mp4" type="video/mp4" />
         </video>
-      </div> */}
+      </div>
       {/* 3D Model Layer */}
       <div
         style={{
           position: "fixed",
           inset: 0,
-          zIndex: 5,
+          zIndex: 15,
           pointerEvents: "auto"
         }}
         className="glow-bg"
@@ -56,38 +56,21 @@ export default function Main() {
           style={{ background: "transparent" }}
           onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
         >
-          <ambientLight intensity={0.35} />
+          <ambientLight intensity={0.04} color="#0a1a10" />
 
-          <directionalLight
-            position={[6, 10, 4]}
-            intensity={2.5}
-            castShadow
-            shadow-mapSize-width={2048}
-            shadow-mapSize-height={2048}
-          />
+          <directionalLight position={[2, 8, 3]} intensity={0.6} color="#3affb8" />
 
-          <directionalLight
-            position={[-5, 4, -2]}
-            intensity={0.5}
-          />
+          <pointLight position={[0, -1, 0]} intensity={0.3} color="#ffe066" distance={6} decay={2} />
 
-          <directionalLight
-            position={[3, 4, 2]}
-            intensity={1.5}
-          />
-
-          <directionalLight
-            position={[-3, 2, -2]}
-            intensity={0.8}
-          />
+          <pointLight position={[-4, 3, -4]} intensity={0.2} color="#1a4a30" distance={10} decay={2} />
 
           <fog attach="fog" args={["#07131b", 5, 35]} />
 
           <ScrollController>
             {/* <Scene1 /> */}
 
-            {/* <Grass /> */}
-            {/* <Tree /> */}
+            <Grass />
+            <Tree />
 
             <Model rotation={[0, Math.PI, 0]} scale={9.5} />
             <Wire />
@@ -103,8 +86,7 @@ export default function Main() {
             makeDefault
           />
 
-          <Environment preset="city" />
-
+          <Environment preset="sunset" />
 
           <EffectComposer>
             <Bloom
@@ -139,7 +121,6 @@ export default function Main() {
 
       <div style={{ height: "400vh" }} />
       <Scene2 />
-      <div style={{ height: "400vh" }} />
 
     </>
   );

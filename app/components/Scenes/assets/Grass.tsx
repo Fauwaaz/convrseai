@@ -39,8 +39,8 @@ export default function Grass() {
   return (
     <primitive
       object={scene}
-      scale={0.4}
-      position={[-4, -2, -0.1]}
+      scale={1}
+      position={[-1.5, -2, -2]}
     />
   )
 }
