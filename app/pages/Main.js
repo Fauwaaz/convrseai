@@ -86,7 +86,7 @@ export default function Main() {
           <ScrollController>
             {/* <Scene1 /> */}
 
-            <Grass />
+            {/* <Grass /> */}
             {/* <Tree /> */}
 
             <Model rotation={[0, Math.PI, 0]} scale={9.5} />

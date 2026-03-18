@@ -6,13 +6,14 @@ import { Canvas, useFrame } from "@react-three/fiber"
 import { useGLTF } from "@react-three/drei"
 import { useEffect, useRef } from "react"
 import * as THREE from "three"
+import { Bloom, EffectComposer } from "@react-three/postprocessing"
 
-function ScrollController({ children }) {
-  const group = useRef()
+// ✅ Fix 3: type children properly
+function ScrollController({ children }: { children: React.ReactNode }) {
+  const group = useRef<THREE.Group>(null!)
 
   useFrame(() => {
     const scroll = window.scrollY / window.innerHeight
-
     if (group.current) {
       group.current.rotation.y = scroll * Math.PI * 0.5
     }
@@ -24,16 +25,17 @@ function ScrollController({ children }) {
 function LogoMesh() {
   const { scene } = useGLTF("/models/logo/logo.glb")
 
-  const group = useRef<THREE.Group>(null!);
-  const targetRotation = useRef(0);
-  const introProgress = useRef(0);
-  const introDone = useRef(false);
+  const group = useRef<THREE.Group>(null!)
+  const targetRotation = useRef(0)
+  const introProgress = useRef(0)
+  const introDone = useRef(false)
 
   useEffect(() => {
     scene.traverse((child) => {
-      if (child.isMesh) {
-        // FORCE visible material
-        child.material = new THREE.MeshStandardMaterial({
+      // ✅ Fix 1: cast to Mesh, use lowercase .material
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh
+        mesh.material = new THREE.MeshStandardMaterial({
           color: "white",
           metalness: 1,
           roughness: 0.2,
@@ -41,59 +43,51 @@ function LogoMesh() {
       }
     })
 
-    // CENTER MODEL
     const box = new THREE.Box3().setFromObject(scene)
     const center = box.getCenter(new THREE.Vector3())
     scene.position.sub(center)
 
-    // AUTO SCALE
     const size = box.getSize(new THREE.Vector3()).length()
     const scale = 2.1 / size
     scene.scale.setScalar(scale)
-
   }, [scene])
 
   useFrame((_, delta) => {
-    if (!group.current) return;
+    if (!group.current) return
+
     if (!introDone.current) {
-      introProgress.current += delta * 0.4;
-
-      const t = Math.min(introProgress.current, 1);
-      const eased = 1 - Math.pow(1 - t, 3);
-      group.current.rotation.y = THREE.MathUtils.degToRad(160) * (1 - eased);
-      group.current.scale.setScalar(100 - (100 - 9.5) * eased);
-
-      if (t >= 1) {
-        introDone.current = true;
-      }
-
-      return;
+      introProgress.current += delta * 0.4
+      const t = Math.min(introProgress.current, 1)
+      const eased = 1 - Math.pow(1 - t, 3)
+      group.current.rotation.y = THREE.MathUtils.degToRad(160) * (1 - eased)
+      group.current.scale.setScalar(100 - (100 - 9.5) * eased)
+      if (t >= 1) introDone.current = true
+      return
     }
+
     group.current.rotation.y = THREE.MathUtils.lerp(
       group.current.rotation.y,
       targetRotation.current,
       0.08
-    );
-  });
+    )
+  })
 
-
-  return <primitive object={scene} />
+  // ✅ Fix 2: wrap primitive in <group ref={group}> so the ref is actually attached
+  return (
+    <group ref={group}>
+      <primitive object={scene} />
+    </group>
+  )
 }
 
 export default function Scene2() {
-
   return (
-
     <section
       className="scene2-root"
       style={{ fontFamily: "var(--font-crystal), sans-serif" }}
     >
       <div className="scene2-panel">
-
-        <motion.div
-          className="scene2-inner"
-        >
-
+        <motion.div className="scene2-inner">
           <h1 className="scene2-title">
             CREATIVE <br />
             DIGITAL <br />
@@ -101,14 +95,13 @@ export default function Scene2() {
           </h1>
 
           <div className="scene2-canvas">
-            <Canvas camera={{ position: [11, 0, 0], fov: 14 }}>
+            <Canvas camera={{ position: [102, 0, 0], fov: 14 }}>
               <ambientLight intensity={0.8} />
 
               <directionalLight position={[12, 5, 5]} intensity={50} />
               <directionalLight position={[-5, -25, -5]} intensity={20} />
 
               <Environment preset="city" />
-
 
               <ScrollController>
                 <LogoMesh />
@@ -121,6 +114,10 @@ export default function Scene2() {
                 maxPolarAngle={Math.PI / 2}
                 makeDefault
               />
+
+              <EffectComposer>
+                <Bloom intensity={0.005} luminanceThreshold={0.1} />
+              </EffectComposer>
             </Canvas>
           </div>
 
@@ -131,13 +128,8 @@ export default function Scene2() {
             <br /><br />
             Our industry-leading web toolset consistently delivers award-winning work through quality & performance
           </p>
-
         </motion.div>
-
       </div>
-
     </section>
-
   )
-
 }
