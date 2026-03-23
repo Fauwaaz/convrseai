@@ -1,7 +1,7 @@
 "use client"
-
 import { useGLTF } from "@react-three/drei"
-import { useLayoutEffect, useMemo } from "react"
+import { useFrame } from "@react-three/fiber"
+import { useLayoutEffect, useMemo, useRef } from "react"
 import * as THREE from "three"
 
 function applyMaterial(scene: THREE.Object3D) {
@@ -28,11 +28,11 @@ function applyMaterial(scene: THREE.Object3D) {
 
 export default function Tree() {
   const { scene } = useGLTF("/models/assets/tree.glb")
+  const groupRef = useRef<THREE.Group>(null!)
 
-  // Pre-clone ALL instances in useMemo — stable across reloads
   const instances = useMemo(() => {
     const pts = []
-    const radius = 1.5
+    const radius = 2
     const count = 17
 
     for (let i = 0; i < count; i++) {
@@ -50,17 +50,31 @@ export default function Tree() {
 
       pts.push({
         object: clone,
-        position: new THREE.Vector3(x, y - 4, z),
+        position: new THREE.Vector3(x, y - 15, z),
         rotation: new THREE.Euler(0, Math.random() * Math.PI * 2.5, 0),
         scale: 1 + Math.random() * 0.3,
       })
     }
-
     return pts
   }, [scene])
 
+  useFrame(() => {
+    if (!groupRef.current) return
+
+    // scroll 0→1 over first viewport, trees rise by 6 units
+    const scroll = window.scrollY / window.innerHeight
+    const targetY = scroll * 6
+
+    // smooth lerp so motion feels floaty/parallax not snappy
+    groupRef.current.position.y = THREE.MathUtils.lerp(
+      groupRef.current.position.y,
+      targetY,
+      0.06
+    )
+  })
+
   return (
-    <group>
+    <group ref={groupRef}>
       {instances.map((inst, i) => (
         <primitive
           key={i}

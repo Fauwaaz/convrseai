@@ -11,10 +11,10 @@ import * as THREE from "three";
 
 
 import Scene1 from "../components/Scenes/Scene1";
-import Grass from "../components/Scenes/assets/Grass";
 import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import Scene2 from "../components/Scenes/Scene2";
-import Tree from "../components/Scenes/assets/Tree";
+import Nature from "../components/Scenes/assets/Nature";
+import Scene3 from "../components/Scenes/Scene3";
 
 function ScrollController({ children }) {
   const group = useRef()
@@ -69,11 +69,12 @@ export default function Main() {
           <ScrollController>
             {/* <Scene1 /> */}
 
-            <Grass />
-            <Tree />
+            <Nature />
 
             <Model rotation={[0, Math.PI, 0]} scale={9.5} />
             <Wire />
+
+            <Scene3 />
 
 
           </ScrollController>
@@ -86,7 +87,7 @@ export default function Main() {
             makeDefault
           />
 
-          <Environment preset="sunset" />
+          <Environment preset="sunset"  background={false}/>
 
           <EffectComposer>
             <Bloom
@@ -119,9 +120,10 @@ export default function Main() {
         </Canvas>
       </div> */}
 
-      <div style={{ height: "400vh" }} />
+      <div style={{ height: "200vh" }} />
       <Scene2 />
-
+      {/* <div style={{ height: "200vh" }} /> */}
+      
     </>
   );
 }
