@@ -30,6 +30,7 @@ function ScrollController({ children }) {
   return <group ref={group}>{children}</group>
 }
 
+
 export default function Main() {
   return (
     <>
@@ -67,16 +68,8 @@ export default function Main() {
           <fog attach="fog" args={["#07131b", 5, 35]} />
 
           <ScrollController>
-            {/* <Scene1 /> */}
-
-            <Nature />
-
-            <Model rotation={[0, Math.PI, 0]} scale={9.5} />
-            <Wire />
-
+            <Scene1 />
             <Scene3 />
-
-
           </ScrollController>
 
           <OrbitControls
@@ -86,8 +79,6 @@ export default function Main() {
             maxPolarAngle={Math.PI / 2}
             makeDefault
           />
-
-          <Environment preset="sunset"  background={false}/>
 
           <EffectComposer>
             <Bloom
@@ -123,7 +114,6 @@ export default function Main() {
       <div style={{ height: "200vh" }} />
       <Scene2 />
       {/* <div style={{ height: "200vh" }} /> */}
-      
     </>
   );
 }

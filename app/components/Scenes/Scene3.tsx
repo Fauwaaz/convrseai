@@ -194,11 +194,11 @@ function Chains() {
 export default function Scene3() {
   const groupRef = useRef<THREE.Group>(null!)
 
-  useFrame(() => {
-    if (!groupRef.current) return
-    const scroll = window.scrollY / window.innerHeight
-    groupRef.current.visible = scroll > 0.9
-  })
+  // useFrame(() => {
+  //   if (!groupRef.current) return
+  //   const scroll = window.scrollY / window.innerHeight
+  //   groupRef.current.visible = scroll > 0.9
+  // })
 
   return (
     <group ref={groupRef}>

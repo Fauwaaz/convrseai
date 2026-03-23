@@ -34,7 +34,7 @@ function Tree() {
 
   const instances = useMemo(() => {
     const pts: { object: THREE.Object3D; position: THREE.Vector3; rotation: THREE.Euler; scale: number }[] = []
-    const radius = 1.5
+    const radius = 2
     const count = 1
 
     for (let i = 0; i < count; i++) {
@@ -52,7 +52,7 @@ function Tree() {
 
       pts.push({
         object: clone,
-        position: new THREE.Vector3(x, y - 10, z),
+        position: new THREE.Vector3(x, y - 9, z),
         rotation: new THREE.Euler(0, Math.random() * Math.PI * 2.5, 0),
         scale: 0.6 + Math.random() * 0.15,
       })

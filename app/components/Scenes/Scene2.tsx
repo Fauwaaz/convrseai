@@ -81,13 +81,12 @@ export default function Scene2() {
           </h1>
 
           <div className="scene2-canvas">
-            <Canvas camera={{ position: [0, 4, 0], fov: 35 }}>
+            <Canvas camera={{ position: [0, 0, 5], fov: 35 }}>
               <ambientLight intensity={0.8} />
 
               <directionalLight position={[12, 5, 5]} intensity={50} />
               <directionalLight position={[-5, -25, -5]} intensity={20} />
 
-              <Environment preset="city" />
 
               <ScrollController>
                 <LogoMesh />
@@ -101,7 +100,7 @@ export default function Scene2() {
                 makeDefault
               />
 
-              <Environment preset="sunset" />
+              <Environment preset="night" />
 
               <EffectComposer>
                 <Bloom intensity={0.005} luminanceThreshold={0.1} />
