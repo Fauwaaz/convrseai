@@ -34,7 +34,7 @@ function ScrollController({ children }) {
 export default function Main() {
   return (
     <>
-      
+
       <div className="projector-layer">
         <video autoPlay loop muted playsInline>
           <source src="/video/reel.mp4" type="video/mp4" />
@@ -57,15 +57,26 @@ export default function Main() {
           style={{ background: "transparent" }}
           onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
         >
-          <ambientLight intensity={0.04} color="#0a1a10" />
+          {/* Replace your current lights with these */}
+          <ambientLight intensity={0.02} color="#000510" />        {/* near-black ambient */}
 
-          <directionalLight position={[2, 8, 3]} intensity={0.6} color="#3affb8" />
+          {/* Key light — strong, tight, creates the bright edge catch */}
+          <directionalLight position={[3, 6, 4]} intensity={2.5} color="#ffffff" />
 
-          <pointLight position={[0, -1, 0]} intensity={0.3} color="#ffe066" distance={6} decay={2} />
+          {/* Rim light from behind — creates the rainbow halo on edges */}
+          <directionalLight position={[-4, 2, -6]} intensity={1.8} color="#4488ff" />
 
-          <pointLight position={[-4, 3, -4]} intensity={0.2} color="#1a4a30" distance={10} decay={2} />
+          {/* Under glow — the warm gold bounce from image 1 */}
+          <pointLight position={[0, -2, 1]} intensity={1.2} color="#ff8833" distance={6} decay={2} />
+
+          {/* Cool fill from left */}
+          <pointLight position={[-3, 3, 2]} intensity={0.6} color="#0033ff" distance={8} decay={2} />
 
           <fog attach="fog" args={["#07131b", 5, 35]} />
+
+
+          {/* sunset gives warm/cool contrast which feeds the iridescence */}
+          <Environment preset="sunset" background={false} />
 
           <ScrollController>
             <Scene1 />

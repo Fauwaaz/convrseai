@@ -22,16 +22,22 @@ const NATURE_MAT = new THREE.MeshPhysicalMaterial({
 })
 
 const LOGO_MAT = new THREE.MeshPhysicalMaterial({
-  transmission: 1,
-  thickness:    2,
-  roughness:    0,
-  metalness:    0,
-  ior:          1.5,
-  clearcoat:    1,
-  reflectivity: 1,
-  side:         THREE.DoubleSide,
-  depthWrite:   true,
-  depthTest:    true,
+  color:              new THREE.Color("#080808"),  // near-black base — dark interior
+  metalness:          1.0,
+  roughness:          0.0,                         // perfectly smooth for sharp reflections
+  transmission:       0.6,                         // partial see-through like glass
+  thickness:          3.0,                         // thick glass = more refraction
+  ior:                2.4,                         // diamond-like — high refraction
+  clearcoat:          1.0,
+  clearcoatRoughness: 0.0,
+  reflectivity:       1.0,
+  envMapIntensity:    3.0,                         // strong env reflection = rainbow sheen
+  iridescence:        1.0,                         // ← THIS creates the rainbow edge
+  iridescenceIOR:     2.2,
+  iridescenceThicknessRange: [100, 800] as [number, number], // thin-film interference = color shift
+  side:               THREE.DoubleSide,
+  depthWrite:         true,
+  depthTest:          true,
 })
 
 function applyMat(
@@ -126,43 +132,6 @@ function Nature() {
   )
 }
 
-
-// Drop this inside ScrollController, behind Nature
-function DarkBackground() {
-  return (
-    <mesh position={[0, 0, -8]} renderOrder={-10}>
-      <planeGeometry args={[40, 22]} />
-      <shaderMaterial
-        depthWrite={false}
-        transparent
-        vertexShader={`
-          varying vec2 vUv;
-          void main() {
-            vUv = uv;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          }
-        `}
-        fragmentShader={`
-          varying vec2 vUv;
-          void main() {
-            vec2 center = vUv - 0.5;
-            float dist = length(center * vec2(1.8, 1.0));  // oval vignette
-            
-            // Dark forest floor center, pure black edges
-            vec3 centerColor = vec3(0.02, 0.06, 0.03);   // very dark green
-            vec3 edgeColor   = vec3(0.0,  0.0,  0.0);    // pure black
-            
-            float vignette = smoothstep(0.0, 0.7, dist);
-            vec3 col = mix(centerColor, edgeColor, vignette);
-            
-            gl_FragColor = vec4(col, 1.0);
-          }
-        `}
-      />
-    </mesh>
-  )
-}
-
 // ─── Model ────────────────────────────────────────────────────────────────────
 function Model(props: any) {
   const { scene }     = useGLTF("/models/logo/Convrse_v1.glb")
@@ -198,7 +167,6 @@ function Model(props: any) {
   )
 }
 
-// ─── Wire ─────────────────────────────────────────────────────────────────────
 function Wire() {
   const { scene } = useGLTF("/models/wires.glb")
   const env       = useEnvironment({ preset: "sunset" })
@@ -207,16 +175,18 @@ function Wire() {
 
   useLayoutEffect(() => {
     const wireMat = new THREE.MeshPhysicalMaterial({
-      color:              "#ffffff",
-      metalness:          1,
-      roughness:          0.12,
-      clearcoat:          1,
-      clearcoatRoughness: 0,
+      color:              new THREE.Color("#111111"),  // dark base — reflections do the work
+      metalness:          1.0,
+      roughness:          0.05,                        // near-mirror
+      clearcoat:          1.0,
+      clearcoatRoughness: 0.0,
       envMap:             env,
-      envMapIntensity:    2,
-      reflectivity:       1,
-      transmission:       0.15,
-      thickness:          0.5,
+      envMapIntensity:    4.0,                         // strong chrome reflections
+      reflectivity:       1.0,
+      iridescence:        0.4,                         // subtle rainbow on wire edges
+      iridescenceIOR:     1.8,
+      iridescenceThicknessRange: [200, 600] as [number, number],
+      transmission:       0.0,                         // wire is opaque chrome
       depthWrite:         true,
       depthTest:          true,
     })
