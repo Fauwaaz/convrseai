@@ -69,7 +69,7 @@ export default function Main() {
 
           <ScrollController>
             <Scene1 />
-            <Scene3 />
+            {/* <Scene3 /> */}
           </ScrollController>
 
           <OrbitControls
