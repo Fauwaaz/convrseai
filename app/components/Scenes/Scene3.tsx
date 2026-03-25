@@ -9,13 +9,32 @@ import * as THREE from "three"
 function applyBoneMaterial(obj: THREE.Object3D) {
   obj.traverse((child: any) => {
     if (!child.isMesh) return
-    child.material = new THREE.MeshStandardMaterial({
-      color: new THREE.Color("#ffffff"),   // ← temp white to debug
-      roughness: 0.3,
-      metalness: 0.0,                      // ← metalness + no light = invisible
-      emissive: new THREE.Color("#ffffff"),
-      emissiveIntensity: 1,
+    child.material = new THREE.MeshPhysicalMaterial({
+      color:              new THREE.Color("#0a0608"),  // near-black base — reflections do the work
+      metalness:          0.9,
+      roughness:          0.08,                        // near-mirror for sharp reflections
+
+      // ── Thin-film iridescence — the pink/cyan/purple shimmer ───────────────
+      iridescence:                 1.0,
+      iridescenceIOR:              1.9,
+      iridescenceThicknessRange:   [180, 650] as [number, number],
+      // lower min = more blue/cyan, higher max = more pink/red shift
+
+      // ── Partial glass — lets dark background show through ─────────────────
+      transmission:   0.25,
+      thickness:      2.0,
+      ior:            1.6,
+
+      clearcoat:          1.0,
+      clearcoatRoughness: 0.05,
+      reflectivity:       1.0,
+      envMapIntensity:    2.5,
+
+      side:       THREE.DoubleSide,
+      depthWrite: true,
+      depthTest:  true,
     })
+    child.renderOrder = 2
   })
 }
 
@@ -23,14 +42,32 @@ function applyBoneMaterial(obj: THREE.Object3D) {
 function applyChainMaterial(obj: THREE.Object3D) {
   obj.traverse((child: any) => {
     if (!child.isMesh) return
-    child.material = new THREE.MeshStandardMaterial({
-      color: new THREE.Color("#8a8aaa"),        // brighter so chains are visible
-      roughness: 0.2,
-      metalness: 1.0,
-      emissive: new THREE.Color("#4444aa"),     // emissive boost so they show up
-      emissiveIntensity: 0.6,
-      side: THREE.DoubleSide,
+    child.material = new THREE.MeshPhysicalMaterial({
+      color:              new THREE.Color("#0a0608"),  // near-black base — reflections do the work
+      metalness:          0.9,
+      roughness:          0.08,                        // near-mirror for sharp reflections
+
+      // ── Thin-film iridescence — the pink/cyan/purple shimmer ───────────────
+      iridescence:                 1.0,
+      iridescenceIOR:              1.9,
+      iridescenceThicknessRange:   [180, 650] as [number, number],
+      // lower min = more blue/cyan, higher max = more pink/red shift
+
+      // ── Partial glass — lets dark background show through ─────────────────
+      transmission:   0.25,
+      thickness:      2.0,
+      ior:            1.6,
+
+      clearcoat:          1.0,
+      clearcoatRoughness: 0.05,
+      reflectivity:       1.0,
+      envMapIntensity:    2.5,
+
+      side:       THREE.DoubleSide,
+      depthWrite: true,
+      depthTest:  true,
     })
+    child.renderOrder = 2
   })
 }
 
@@ -70,11 +107,11 @@ function Spine() {
       return {
         object: clone,
         // ↓ ADJUST THIS: i * 1.1 = spacing between bones, -3 = vertical start offset
-        position: new THREE.Vector3(0, i * 1.1 - 3, 0),
+        position: new THREE.Vector3(0, i * 1.1 - 25, -5),
         rotation: new THREE.Euler(
           0,
-          (i * Math.PI) / 5,   // ← twist per segment
-          i % 2 === 0 ? 0.05 : -0.05
+          (i * Math.PI) / 1,   // ← twist per segment
+          i % 2 === 0 ? 0 : 0
         ),
       }
     })
@@ -92,14 +129,14 @@ function Spine() {
 
   return (
     // ↓ ADJUST THIS: [x, y, z] — x=0 keeps spine dead center
-    <group ref={groupRef} position={[-6, -3, 0]}>
+    <group ref={groupRef} position={[0, 0, 5]}>
       {segments.map(({ object, position, rotation }, i) => (
         <primitive
           key={i}
           object={object}
           position={position}
           rotation={rotation}
-          scale={1.5}   // ← ADJUST: overall bone size
+          scale={1.8}   // ← ADJUST: overall bone size
         />
       ))}
     </group>
@@ -175,12 +212,12 @@ function Chains() {
     groupRef.current.position.y = THREE.MathUtils.lerp(
       groupRef.current.position.y,
       scroll * 5,
-      0.04
+      2
     )
   })
 
   return (
-    <group ref={groupRef}>
+    <group ref={groupRef} position={[0, 0, 5]}>
       {chains.map((c, i) => (
         <primitive key={i} object={c.object} position={c.pos} rotation={c.rot} scale={c.scale} />
       ))}

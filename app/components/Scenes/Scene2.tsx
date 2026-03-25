@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import { Environment, OrbitControls } from "@react-three/drei"
 import { Canvas, useFrame } from "@react-three/fiber"
 import { useGLTF } from "@react-three/drei"
-import { useEffect, useRef } from "react"
+import { useLayoutEffect, useRef } from "react"
 import * as THREE from "three"
 import { Bloom, EffectComposer } from "@react-three/postprocessing"
 
@@ -24,37 +24,50 @@ function ScrollController({ children }: { children: React.ReactNode }) {
 
 function LogoMesh() {
   const { scene } = useGLTF("/models/logo/logo.glb")
-
   const group = useRef<THREE.Group>(null!)
-  const targetRotation = useRef(0)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    // ─── Apply LOGO_MAT to every mesh ────────────────────────────────────────
     scene.traverse((child) => {
-      if ((child as THREE.Mesh).isMesh) {
-        const mesh = child as THREE.Mesh
-        mesh.material = new THREE.MeshStandardMaterial({
-          color: "white",
-          metalness: 1,
-          roughness: 0.2,
-        })
-      }
+      if (!(child as THREE.Mesh).isMesh) return
+      const mesh = child as THREE.Mesh
+      mesh.material = new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color("#ffffff"),
+        metalness: 1.0,
+        roughness: 0.2,
+        transmission: 0.6,
+        thickness: 3.0,
+        ior: 2.4,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.0,
+        reflectivity: 1.0,
+        envMapIntensity: 3.0,
+        iridescence: 1.0,
+        iridescenceIOR: 2.2,
+        iridescenceThicknessRange: [100, 800] as [number, number],
+        side: THREE.DoubleSide,
+        depthWrite: true,
+        depthTest: true,
+      })
+      mesh.renderOrder = 10
+      mesh.castShadow = false
+      mesh.receiveShadow = false
     })
 
     const box = new THREE.Box3().setFromObject(scene)
+    const size = box.getSize(new THREE.Vector3()).length()
+    scene.scale.setScalar(2.4 / size)
+
+    box.setFromObject(scene)
     const center = box.getCenter(new THREE.Vector3())
     scene.position.sub(center)
-
-    const size = box.getSize(new THREE.Vector3()).length()
-    const scale = 2.1 / size
-    scene.scale.setScalar(scale)
   }, [scene])
 
   useFrame(() => {
     if (!group.current) return
-
     group.current.rotation.y = THREE.MathUtils.lerp(
       group.current.rotation.y,
-      targetRotation.current,
+      0,   // targetRotation.current — restore if you need scroll rotation
       0.08
     )
   })
@@ -72,6 +85,16 @@ export default function Scene2() {
       className="scene2-root"
       style={{ fontFamily: "var(--font-crystal), sans-serif" }}
     >
+<div className="glass-top">
+  <div className="glass-light" />
+  <div className="glass-noise" />
+</div>
+
+<div className="glass-bottom">
+  <div className="glass-light" />
+  <div className="glass-noise" />
+</div>
+
       <div className="scene2-panel">
         <motion.div className="scene2-inner">
           <h1 className="scene2-title">
@@ -81,7 +104,7 @@ export default function Scene2() {
           </h1>
 
           <div className="scene2-canvas">
-            <Canvas camera={{ position: [0, 0, 5], fov: 35 }}>
+            <Canvas camera={{ position: [0, 0, 5], fov: 32 }}>
               <ambientLight intensity={0.8} />
 
               <directionalLight position={[12, 5, 5]} intensity={50} />
