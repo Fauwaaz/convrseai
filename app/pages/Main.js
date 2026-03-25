@@ -80,7 +80,7 @@ export default function Main() {
 
           <ScrollController>
             <Scene1 />
-            {/* <Scene3 /> */}
+            <Scene3 />
           </ScrollController>
           
 
@@ -125,7 +125,7 @@ export default function Main() {
 
       <div style={{ height: "200vh" }} />
       <Scene2 />
-      {/* <div style={{ height: "250vh" }} /> */}
+      <div style={{ height: "250vh" }} />
     </>
   );
 }

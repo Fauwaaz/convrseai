@@ -85,16 +85,6 @@ export default function Scene2() {
       className="scene2-root"
       style={{ fontFamily: "var(--font-crystal), sans-serif" }}
     >
-<div className="glass-top">
-  <div className="glass-light" />
-  <div className="glass-noise" />
-</div>
-
-<div className="glass-bottom">
-  <div className="glass-light" />
-  <div className="glass-noise" />
-</div>
-
       <div className="scene2-panel">
         <motion.div className="scene2-inner">
           <h1 className="scene2-title">
