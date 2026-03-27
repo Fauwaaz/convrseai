@@ -35,11 +35,11 @@ export default function Main() {
   return (
     <>
 
-      {/* <div className="projector-layer">
+      <div className="projector-layer">
         <video autoPlay loop muted playsInline>
           <source src="/video/reel.mp4" type="video/mp4" />
         </video>
-      </div> */}
+      </div>
       {/* 3D Model Layer */}
       <div
         style={{
@@ -125,7 +125,7 @@ export default function Main() {
 
       <div style={{ height: "200vh" }} />
       <Scene2 />
-      <div style={{ height: "250vh" }} />
+      <div style={{ height: "350vh" }} />
     </>
   );
 }

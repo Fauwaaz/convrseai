@@ -1,7 +1,7 @@
 "use client"
 import { useGLTF } from "@react-three/drei"
 import { useFrame } from "@react-three/fiber"
-import { useMemo, useRef } from "react"
+import { useLayoutEffect, useMemo, useRef } from "react"
 import * as THREE from "three"
 
 // ─── Materials ───────────────────────────────────────────────────────────────
@@ -12,7 +12,7 @@ function applyBoneMaterial(obj: THREE.Object3D) {
     child.material = new THREE.MeshPhysicalMaterial({
       color:              new THREE.Color("#0a0608"),  // near-black base — reflections do the work
       metalness:          0.9,
-      roughness:          0.08,                        // near-mirror for sharp reflections
+      roughness:          0.2,                        // near-mirror for sharp reflections
 
       // ── Thin-film iridescence — the pink/cyan/purple shimmer ───────────────
       iridescence:                 1.0,
@@ -43,29 +43,16 @@ function applyChainMaterial(obj: THREE.Object3D) {
   obj.traverse((child: any) => {
     if (!child.isMesh) return
     child.material = new THREE.MeshPhysicalMaterial({
-      color:              new THREE.Color("#0a0608"),  // near-black base — reflections do the work
-      metalness:          0.9,
-      roughness:          0.08,                        // near-mirror for sharp reflections
-
-      // ── Thin-film iridescence — the pink/cyan/purple shimmer ───────────────
-      iridescence:                 1.0,
-      iridescenceIOR:              1.9,
-      iridescenceThicknessRange:   [180, 650] as [number, number],
-      // lower min = more blue/cyan, higher max = more pink/red shift
-
-      // ── Partial glass — lets dark background show through ─────────────────
-      transmission:   0.25,
-      thickness:      2.0,
-      ior:            1.6,
-
+      color:              new THREE.Color("#d0d8e0"),
+      metalness:          1.0,
+      roughness:          0.08,
       clearcoat:          1.0,
       clearcoatRoughness: 0.05,
       reflectivity:       1.0,
-      envMapIntensity:    2.5,
-
-      side:       THREE.DoubleSide,
-      depthWrite: true,
-      depthTest:  true,
+      envMapIntensity:    2.0,
+      iridescence:        0.3,
+      iridescenceIOR:     1.5,
+      iridescenceThicknessRange: [100, 400] as [number, number],
     })
     child.renderOrder = 2
   })
@@ -96,7 +83,7 @@ function centerObject(obj: THREE.Object3D) {
 // ─── Spine ────────────────────────────────────────────────────────────────────
 
 function Spine() {
-  const { scene } = useGLTF("/models/assets/bone.glb")
+  const { scene } = useGLTF("/models/assets/spine.glb")
   const groupRef = useRef<THREE.Group>(null!)
 
   const segments = useMemo(() => {
@@ -107,7 +94,7 @@ function Spine() {
       return {
         object: clone,
         // ↓ ADJUST THIS: i * 1.1 = spacing between bones, -3 = vertical start offset
-        position: new THREE.Vector3(0, i * 1.1 - 25, -5),
+        position: new THREE.Vector3(0, i * 1.1 - 28, -5),
         rotation: new THREE.Euler(
           0,
           (i * Math.PI) / 1,   // ← twist per segment
@@ -184,26 +171,58 @@ function Plates() {
   )
 }
 
-// ─── Chains ───────────────────────────────────────────────────────────────────
+// ─── Chain configs — circular wrap around spine center ────────────────────────
+// Spine is at x=0, z=-5. Chains orbit around it in an oval ring.
+// Each chain segment is tangent to the ring at its position angle.
 
-const CHAIN_CONFIGS = [
-  // ↓ ADJUST THESE: connect spine (x≈0) to plates (x≈±3.5)
-  { pos: [-1.8,  1.2, 0] as [number,number,number], rot: [0, 0,  0.6] as [number,number,number], scale: [3.0, 1, 1] as [number,number,number] },
-  { pos: [ 1.8,  0.5, 0] as [number,number,number], rot: [0, 0, -0.5] as [number,number,number], scale: [2.8, 1, 1] as [number,number,number] },
-  { pos: [-2.0, -2.2, 0] as [number,number,number], rot: [0, 0,  0.4] as [number,number,number], scale: [3.0, 1, 1] as [number,number,number] },
-  { pos: [ 2.0, -2.5, 0] as [number,number,number], rot: [0, 0, -0.4] as [number,number,number], scale: [2.8, 1, 1] as [number,number,number] },
+const RING_RADIUS_X = 2.2   // oval width  — how far left/right
+const RING_RADIUS_Z = 1.4   // oval depth  — how far front/back
+
+// Generate N chain segments evenly spaced around the oval
+function buildChainRing(scene: THREE.Group, count = 12) {
+  return Array.from({ length: count }, (_, i) => {
+    const angle = (i / count) * Math.PI * 2
+
+    // Position on oval
+    const x = Math.cos(angle) * RING_RADIUS_X
+    const z = Math.sin(angle) * RING_RADIUS_Z - 5   // -5 = spine Z offset
+
+    // Tangent angle — chain links face along the ring direction
+    const tangentAngle = Math.atan2(
+      Math.cos(angle) * RING_RADIUS_Z,
+      -Math.sin(angle) * RING_RADIUS_X
+    )
+
+    const clone = scene.clone(true)
+    applyChainMaterial(clone)
+
+    return {
+      object:    clone,
+      pos:       [x, 0, z]              as [number, number, number],
+      rot:       [0, tangentAngle, 0]   as [number, number, number],
+      scale:     [1.1, 1.0, 1.0]        as [number, number, number],
+    }
+  })
+}
+
+// ─── Vertical chain strands — hang from top and bottom of spine ───────────────
+const STRAND_CONFIGS = [
+  // Drape from spine top downward — x offset keeps them wrapping the body
+  { pos: [-2.0,  3, -5] as [number,number,number], rot: [0.15, 0,  0.3] as [number,number,number], scale: [1, 4.5, 1] as [number,number,number] },
+  { pos: [ 2.0,  3, -5] as [number,number,number], rot: [0.15, 0, -0.3] as [number,number,number], scale: [1, 4.5, 1] as [number,number,number] },
+  { pos: [-1.0,  2, -3.8] as [number,number,number], rot: [0.3,  0.4, 0.15] as [number,number,number], scale: [1, 3.5, 1] as [number,number,number] },
+  { pos: [ 1.0,  2, -3.8] as [number,number,number], rot: [0.3, -0.4, -0.15] as [number,number,number], scale: [1, 3.5, 1] as [number,number,number] },
+  // Drape below spine
+  { pos: [-1.5, -4, -5] as [number,number,number], rot: [-0.1, 0,  0.2] as [number,number,number], scale: [1, 3.0, 1] as [number,number,number] },
+  { pos: [ 1.5, -4, -5] as [number,number,number], rot: [-0.1, 0, -0.2] as [number,number,number], scale: [1, 3.0, 1] as [number,number,number] },
 ]
 
 function Chains() {
   const { scene } = useGLTF("/models/assets/chain.glb")
-  const groupRef = useRef<THREE.Group>(null!)
+  const groupRef  = useRef<THREE.Group>(null!)
 
-  const chains = useMemo(() => {
-    return CHAIN_CONFIGS.map((c) => {
-      const clone = scene.clone(true)
-      applyChainMaterial(clone)
-      return { ...c, object: clone }
-    })
+  useLayoutEffect(() => {
+    applyChainMaterial(scene)
   }, [scene])
 
   useFrame(() => {
@@ -211,20 +230,23 @@ function Chains() {
     const scroll = window.scrollY / window.innerHeight
     groupRef.current.position.y = THREE.MathUtils.lerp(
       groupRef.current.position.y,
-      scroll * 5,
-      2
+      scroll * 3.5,
+      0.05
     )
   })
 
   return (
-    <group ref={groupRef} position={[0, 0, 5]}>
-      {chains.map((c, i) => (
-        <primitive key={i} object={c.object} position={c.pos} rotation={c.rot} scale={c.scale} />
-      ))}
+    <group ref={groupRef}>
+      {/* ── Single chain, scaled and positioned to wrap around spine ── */}
+      <primitive
+        object={scene}
+        position={[0, -26, 0]}   // centered on spine
+        rotation={[0, 0, 0]}
+        scale={1.5}
+      />
     </group>
   )
 }
-
 
 // ─── Scene3 ───────────────────────────────────────────────────────────────────
 
