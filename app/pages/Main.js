@@ -35,11 +35,11 @@ export default function Main() {
   return (
     <>
 
-      <div className="projector-layer">
+      {/* <div className="projector-layer">
         <video autoPlay loop muted playsInline>
           <source src="/video/reel.mp4" type="video/mp4" />
         </video>
-      </div>
+      </div> */}
       {/* 3D Model Layer */}
       <div
         style={{
@@ -57,32 +57,31 @@ export default function Main() {
           style={{ background: "transparent" }}
           onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
         >
-          {/* Replace your current lights with these */}
-          <ambientLight intensity={0.02} color="#000510" />        {/* near-black ambient */}
+          <ambientLight intensity={0.005} color="#000000" />
 
-          {/* Key light — strong, tight, creates the bright edge catch */}
-          <directionalLight position={[3, 6, 4]} intensity={2.5} color="#ffffff" />
+          {/* ── CENTER CORE — white-green emit from logo position ─────────── */}
+          <pointLight position={[0, 0.5, 1]} intensity={6} color="#ccffdd" distance={10} decay={2} />
+          <pointLight position={[0, 0, 0]} intensity={3} color="#ffffff" distance={5} decay={2.5} />
 
-          {/* Rim light from behind — creates the rainbow halo on edges */}
-          <directionalLight position={[-4, 2, -6]} intensity={1.8} color="#4488ff" />
+          {/* ── GROUND POOL — warm yellow-green, lights trees from below ──── */}
+          <pointLight position={[0, -3, 0]} intensity={14} color="#aaff00" distance={12} decay={1.5} />
+          <pointLight position={[0, -5, -1]} intensity={8} color="#88cc00" distance={18} decay={1.2} />
 
-          {/* Under glow — the warm gold bounce from image 1 */}
-          <pointLight position={[0, -2, 1]} intensity={1.2} color="#ff8833" distance={6} decay={2} />
+          {/* ── TREE SIDE FILL — very dim green, just enough to see shape ─── */}
+          <pointLight position={[-5, -1, -2]} intensity={2} color="#224400" distance={12} decay={2} />
+          <pointLight position={[5, -1, -2]} intensity={2} color="#224400" distance={12} decay={2} />
 
-          {/* Cool fill from left */}
-          <pointLight position={[-3, 3, 2]} intensity={0.6} color="#0033ff" distance={8} decay={2} />
+          {/* ── NO directional lights — pure point source look ───────────── */}
 
-          <fog attach="fog" args={["#07131b", 5, 35]} />
+          {/* Fog — pure black, close start so edges fall off fast */}
+          <fog attach="fog" args={["#000000", 5, 22]} />
 
-
-          {/* sunset gives warm/cool contrast which feeds the iridescence */}
-          <Environment preset="sunset" background={false} />
+          <Environment preset="night" background={false} />
 
           <ScrollController>
             <Scene1 />
             <Scene3 />
           </ScrollController>
-          
 
           <OrbitControls
             enableZoom={false}
@@ -95,8 +94,9 @@ export default function Main() {
           <EffectComposer>
             <Bloom
               intensity={0.01}
-              luminanceThreshold={0.01}
+              luminanceThreshold={0.1}
               luminanceSmoothing={0.9}
+              mipmapBlur
             />
           </EffectComposer>
         </Canvas>

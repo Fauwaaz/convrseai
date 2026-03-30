@@ -240,7 +240,7 @@ function Chains() {
       {/* ── Single chain, scaled and positioned to wrap around spine ── */}
       <primitive
         object={scene}
-        position={[0, -26, 0]}   // centered on spine
+        position={[0, -26.5, 0]}   // centered on spine
         rotation={[0, 0, 0]}
         scale={1.5}
       />
