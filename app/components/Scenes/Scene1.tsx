@@ -2,7 +2,7 @@
 
 import { useGLTF, useEnvironment } from "@react-three/drei"
 import { useFrame } from "@react-three/fiber"
-import { useLayoutEffect, useRef, useState, useEffect } from "react"
+import { useLayoutEffect, useRef, useState, useEffect, useMemo } from "react"
 import * as THREE from "three"
 
 // ─── Materials ────────────────────────────────────────────────────────────────
@@ -22,8 +22,8 @@ const NATURE_MAT = new THREE.MeshPhysicalMaterial({
 
 const LOGO_MAT = new THREE.MeshPhysicalMaterial({
   color: new THREE.Color("#ffffff"),  // pure white base
-  metalness: 0.5,
-  roughness: 0.08,                        // near-mirror, slight softness
+  metalness: 0.9,
+  roughness: 0,                        
   transmission: 0.0,                         // fully opaque — no glass
   clearcoat: 1.0,
   clearcoatRoughness: 0.0,
@@ -48,6 +48,7 @@ function applyMat(
     child.receiveShadow = false
   })
 }
+
 
 // ─── Scroll ───────────────────────────────────────────────────────────────────
 let _scroll = 0, _dirty = true
@@ -86,6 +87,99 @@ function useScrollVisible(threshold = 1000) {
   return visible
 }
 
+function FogVolume() {
+  const { scene } = useGLTF("/models/assets/fog.glb")
+  const g1 = useRef<THREE.Group>(null!)
+  const g2 = useRef<THREE.Group>(null!)
+  const g3 = useRef<THREE.Group>(null!)
+
+  useLayoutEffect(() => {
+    const applyFogMat = (obj: THREE.Object3D) => {
+      obj.traverse((child: any) => {
+        if (!child.isMesh) return
+        child.material = new THREE.MeshStandardMaterial({
+          color:           new THREE.Color("#aaffcc"),
+          transparent:     true,
+          opacity:         0.055,
+          depthWrite:      false,
+          roughness:       1.0,
+          metalness:       0.0,
+          side:            THREE.DoubleSide,
+          envMapIntensity: 0.0,
+        })
+        child.renderOrder   = 3
+        child.castShadow    = false
+        child.receiveShadow = false
+      })
+    }
+
+    applyFogMat(scene)
+    applyFogMat(scene.clone())
+    applyFogMat(scene.clone())
+  }, [scene])
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime()
+
+    // Slow drift — fog layers move independently
+    if (g1.current) {
+      g1.current.position.x = Math.sin(t * 0.08) * 0.4
+      g1.current.position.z = Math.cos(t * 0.06) * 0.3
+    }
+    if (g2.current) {
+      g2.current.position.x = Math.sin(t * 0.05 + 1) * 0.6
+      g2.current.rotation.y = t * 0.02
+    }
+    if (g3.current) {
+      g3.current.position.x = Math.cos(t * 0.07 + 2) * 0.5
+      g3.current.rotation.y = -t * 0.015
+    }
+  })
+
+  const clone1 = useMemo(() => scene.clone(true), [scene])
+  const clone2 = useMemo(() => scene.clone(true), [scene])
+
+  useLayoutEffect(() => {
+    const fogMat = new THREE.MeshStandardMaterial({
+      color:           new THREE.Color("#aaffcc"),
+      transparent:     true,
+      opacity:         0.055,
+      depthWrite:      false,
+      roughness:       1.0,
+      metalness:       0.0,
+      side:            THREE.DoubleSide,
+      envMapIntensity: 0.0,
+    })
+    ;[scene, clone1, clone2].forEach(s =>
+      s.traverse((c: any) => {
+        if (!c.isMesh) return
+        c.material    = fogMat
+        c.renderOrder = 3
+        c.castShadow  = false
+      })
+    )
+  }, [scene, clone1, clone2])
+
+  return (
+    <>
+      {/* Ground gold pool layer */}
+      <group ref={g1} position={[0, -3.2, 0]}>
+        <primitive object={scene} scale={[3.5, 1.2, 3.5]} />
+      </group>
+
+      {/* Mid teal scatter layer */}
+      <group ref={g2} position={[0, -1.8, -1]} rotation={[0, Math.PI * 0.25, 0]}>
+        <primitive object={clone1} scale={[2.8, 0.9, 2.2]} />
+      </group>
+
+      {/* Deep back atmosphere */}
+      <group ref={g3} position={[0, -0.8, -3]} rotation={[0, Math.PI * 0.5, 0]}>
+        <primitive object={clone2} scale={[4.5, 1.0, 2.5]} />
+      </group>
+    </>
+  )
+}
+
 // ─── Nature ───────────────────────────────────────────────────────────────────
 function Nature() {
   const { scene: treeSceneA } = useGLTF("/models/assets/tree.glb")
@@ -115,7 +209,7 @@ function Nature() {
     if (frontGrassRef.current) setY(frontGrassRef.current, s * 3)
 
     // ── Rotation — lerped for smooth horizontal turn ───────────────────────
-    const rotTarget = s * Math.PI * 0.15   // subtle rotation as you scroll
+    const rotTarget = s * Math.PI    // subtle rotation as you scroll
     if (backTreeRef.current) lerpRotY(backTreeRef.current, Math.PI * 0.3 + rotTarget)
     if (frontTreeRef.current) lerpRotY(frontTreeRef.current, -Math.PI * 0.3 + rotTarget)
     if (backGrassRef.current) lerpRotY(backGrassRef.current, Math.PI * 0.1 + rotTarget)
@@ -223,7 +317,7 @@ export default function Scene1() {
   return (
     <>
       <Nature />
-
+      <FogVolume />
       {/* Unmounted entirely when scrolled past 1000px — zero GPU cost */}
       {logoVisible && (
         <group position={[0, 0, 0]}>

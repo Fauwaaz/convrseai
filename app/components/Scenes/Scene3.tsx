@@ -5,53 +5,44 @@ import { useLayoutEffect, useMemo, useRef } from "react"
 import * as THREE from "three"
 
 // ─── Materials ───────────────────────────────────────────────────────────────
-
 function applyBoneMaterial(obj: THREE.Object3D) {
   obj.traverse((child: any) => {
     if (!child.isMesh) return
     child.material = new THREE.MeshPhysicalMaterial({
-      color:              new THREE.Color("#0a0608"),  // near-black base — reflections do the work
-      metalness:          0.9,
-      roughness:          0.2,                        // near-mirror for sharp reflections
-
-      // ── Thin-film iridescence — the pink/cyan/purple shimmer ───────────────
-      iridescence:                 1.0,
-      iridescenceIOR:              1.9,
-      iridescenceThicknessRange:   [180, 650] as [number, number],
-      // lower min = more blue/cyan, higher max = more pink/red shift
-
-      // ── Partial glass — lets dark background show through ─────────────────
-      transmission:   0.25,
-      thickness:      2.0,
-      ior:            1.6,
-
-      clearcoat:          1.0,
-      clearcoatRoughness: 0.05,
-      reflectivity:       1.0,
-      envMapIntensity:    2.5,
-
-      side:       THREE.DoubleSide,
-      depthWrite: true,
-      depthTest:  true,
+      color:                     new THREE.Color("#0a0608"),
+      metalness:                 0.9,
+      roughness:                 0.2,
+      iridescence:               1.0,
+      iridescenceIOR:            1.9,
+      iridescenceThicknessRange: [180, 650] as [number, number],
+      transmission:              0.25,
+      thickness:                 2.0,
+      ior:                       1.6,
+      clearcoat:                 1.0,
+      clearcoatRoughness:        0.05,
+      reflectivity:              1.0,
+      envMapIntensity:           2.5,
+      side:                      THREE.DoubleSide,
+      depthWrite:                true,
+      depthTest:                 true,
     })
     child.renderOrder = 2
   })
 }
 
-
 function applyChainMaterial(obj: THREE.Object3D) {
   obj.traverse((child: any) => {
     if (!child.isMesh) return
     child.material = new THREE.MeshPhysicalMaterial({
-      color:              new THREE.Color("#d0d8e0"),
-      metalness:          1.0,
-      roughness:          0.08,
-      clearcoat:          1.0,
-      clearcoatRoughness: 0.05,
-      reflectivity:       1.0,
-      envMapIntensity:    2.0,
-      iridescence:        0.3,
-      iridescenceIOR:     1.5,
+      color:                     new THREE.Color("#d0d8e0"),
+      metalness:                 1.0,
+      roughness:                 0.08,
+      clearcoat:                 1.0,
+      clearcoatRoughness:        0.05,
+      reflectivity:              1.0,
+      envMapIntensity:           2.0,
+      iridescence:               0.3,
+      iridescenceIOR:            1.5,
       iridescenceThicknessRange: [100, 400] as [number, number],
     })
     child.renderOrder = 2
@@ -62,26 +53,52 @@ function applyPlateMaterial(obj: THREE.Object3D, tint: string) {
   obj.traverse((child: any) => {
     if (!child.isMesh) return
     child.material = new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color(tint),
-      roughness: 0.05,
-      metalness: 0.1,
+      color:        new THREE.Color(tint),
+      roughness:    0.05,
+      metalness:    0.1,
       transmission: 0.6,
-      thickness: 0.5,
-      transparent: true,
-      opacity: 0.85,
-      side: THREE.DoubleSide,
+      thickness:    0.5,
+      transparent:  true,
+      opacity:      0.85,
+      side:         THREE.DoubleSide,
     })
   })
 }
 
+// ─── Flower material ──────────────────────────────────────────────────────────
+function applyFlowerMaterial(obj: THREE.Object3D) {
+  obj.traverse((child: any) => {
+    if (!child.isMesh) return
+    child.material = new THREE.MeshPhysicalMaterial({
+      color:                     new THREE.Color("#1a0820"),
+      metalness:                 0.3,
+      roughness:                 0.4,
+      iridescence:               0.8,
+      iridescenceIOR:            1.6,
+      iridescenceThicknessRange: [200, 700] as [number, number],
+      clearcoat:                 0.6,
+      clearcoatRoughness:        0.1,
+      envMapIntensity:           1.8,
+      side:                      THREE.DoubleSide,
+      opacity:                   0.1,
+    })
+    child.renderOrder = 2
+  })
+}
+
 function centerObject(obj: THREE.Object3D) {
-  const box = new THREE.Box3().setFromObject(obj)
+  const box    = new THREE.Box3().setFromObject(obj)
   const center = box.getCenter(new THREE.Vector3())
   obj.position.sub(center)
 }
 
-// ─── Spine ────────────────────────────────────────────────────────────────────
+function setY(g: THREE.Group, target: number) { g.position.y = target }
+function lerpRotY(g: THREE.Group, target: number, alpha = 0.06) {
+  if (Math.abs(g.rotation.y - target) > 0.0001)
+    g.rotation.y += (target - g.rotation.y) * alpha
+}
 
+// ─── Spine ────────────────────────────────────────────────────────────────────
 function Spine() {
   const { scene } = useGLTF("/models/assets/spine.glb")
   const groupRef = useRef<THREE.Group>(null!)
@@ -110,7 +127,7 @@ function Spine() {
     groupRef.current.position.y = THREE.MathUtils.lerp(
       groupRef.current.position.y,
       scroll * 4,
-      0.05
+      1
     )
   })
 
@@ -130,19 +147,47 @@ function Spine() {
   )
 }
 
-// ─── Plates ───────────────────────────────────────────────────────────────────
+// ─── Flowers — ONE instance, positioned as a group on the side ────────────────
+function Flowers() {
+  const { scene } = useGLTF("/models/assets/flower.glb")
+  const groupRef  = useRef<THREE.Group>(null!)
 
+  useLayoutEffect(() => {
+    applyFlowerMaterial(scene)
+    // ── No centerObject — position controlled via primitive props below ──
+  }, [scene])
+
+  useFrame(() => {
+    if (!groupRef.current) return
+    const s = window.scrollY / window.innerHeight
+    setY(groupRef.current, s * 4)
+    lerpRotY(groupRef.current, s * Math.PI * 0)
+  })
+
+  return (
+    <group ref={groupRef} position={[0, 0, 5]}>
+      <primitive
+        object={scene}
+        position={[-0.5, -25, -6]}   
+        rotation={[0, 0.5, 0]}   
+        scale={1.5}              // ← ADJUST: overall flower size 
+      />
+    </group>
+  )
+}
+
+
+// ─── Plates ───────────────────────────────────────────────────────────────────
 const PLATE_CONFIGS = [
-  // ↓ ADJUST THESE: [x, y, z] pos — negative x = left, positive x = right
-  { pos: [-3.5,  1.0, -1]   as [number,number,number], rot: [0,  0.3, -0.08] as [number,number,number], tint: "#7a5a20", scale: 1.4 },
-  { pos: [ 3.2,  0.5, -0.5] as [number,number,number], rot: [0, -0.4,  0.06] as [number,number,number], tint: "#0a4a6a", scale: 1.3 },
-  { pos: [-3.8, -2.5, -0.8] as [number,number,number], rot: [0,  0.2,  0.04] as [number,number,number], tint: "#3a0a5a", scale: 1.1 },
-  { pos: [ 3.5, -2.8, -1]   as [number,number,number], rot: [0, -0.3, -0.05] as [number,number,number], tint: "#0a2a4a", scale: 1.2 },
+  { pos: [-0.5,  -21, 0.2]   as [number,number,number], rot: [0,  -1, 0] as [number,number,number], tint: "#7a5a20", scale: 1 },
+  // { pos: [ 3.2,  0.5, -0.5] as [number,number,number], rot: [0, -0.4,  0.06] as [number,number,number], tint: "#0a4a6a", scale: 1.3 },
+  // { pos: [-3.8, -2.5, -0.8] as [number,number,number], rot: [0,  0.2,  0.04] as [number,number,number], tint: "#3a0a5a", scale: 1.1 },
+  // { pos: [ -0.5,  -24.5, 0]   as [number,number,number], rot: [0, 0, 0] as [number,number,number], tint: "#0a2a4a", scale: 1.2 },
 ]
 
 function Plates() {
-  const { scene } = useGLTF("/models/assets/plate.glb")
-  const groupRef = useRef<THREE.Group>(null!)
+  const { scene } = useGLTF("/models/assets/plates.glb")
+  const groupRef  = useRef<THREE.Group>(null!)
 
   const plates = useMemo(() => {
     return PLATE_CONFIGS.map((p) => {
@@ -154,12 +199,9 @@ function Plates() {
 
   useFrame(() => {
     if (!groupRef.current) return
-    const scroll = window.scrollY / window.innerHeight
-    groupRef.current.position.y = THREE.MathUtils.lerp(
-      groupRef.current.position.y,
-      scroll * 5,
-      0.04
-    )
+    const s = window.scrollY / window.innerHeight
+    setY(groupRef.current, s * 5)
+    lerpRotY(groupRef.current, s * Math.PI * 0.08)
   })
 
   return (
@@ -171,97 +213,33 @@ function Plates() {
   )
 }
 
-// ─── Chain configs — circular wrap around spine center ────────────────────────
-// Spine is at x=0, z=-5. Chains orbit around it in an oval ring.
-// Each chain segment is tangent to the ring at its position angle.
-
-const RING_RADIUS_X = 2.2   // oval width  — how far left/right
-const RING_RADIUS_Z = 1.4   // oval depth  — how far front/back
-
-// Generate N chain segments evenly spaced around the oval
-function buildChainRing(scene: THREE.Group, count = 12) {
-  return Array.from({ length: count }, (_, i) => {
-    const angle = (i / count) * Math.PI * 2
-
-    // Position on oval
-    const x = Math.cos(angle) * RING_RADIUS_X
-    const z = Math.sin(angle) * RING_RADIUS_Z - 5   // -5 = spine Z offset
-
-    // Tangent angle — chain links face along the ring direction
-    const tangentAngle = Math.atan2(
-      Math.cos(angle) * RING_RADIUS_Z,
-      -Math.sin(angle) * RING_RADIUS_X
-    )
-
-    const clone = scene.clone(true)
-    applyChainMaterial(clone)
-
-    return {
-      object:    clone,
-      pos:       [x, 0, z]              as [number, number, number],
-      rot:       [0, tangentAngle, 0]   as [number, number, number],
-      scale:     [1.1, 1.0, 1.0]        as [number, number, number],
-    }
-  })
-}
-
-// ─── Vertical chain strands — hang from top and bottom of spine ───────────────
-const STRAND_CONFIGS = [
-  // Drape from spine top downward — x offset keeps them wrapping the body
-  { pos: [-2.0,  3, -5] as [number,number,number], rot: [0.15, 0,  0.3] as [number,number,number], scale: [1, 4.5, 1] as [number,number,number] },
-  { pos: [ 2.0,  3, -5] as [number,number,number], rot: [0.15, 0, -0.3] as [number,number,number], scale: [1, 4.5, 1] as [number,number,number] },
-  { pos: [-1.0,  2, -3.8] as [number,number,number], rot: [0.3,  0.4, 0.15] as [number,number,number], scale: [1, 3.5, 1] as [number,number,number] },
-  { pos: [ 1.0,  2, -3.8] as [number,number,number], rot: [0.3, -0.4, -0.15] as [number,number,number], scale: [1, 3.5, 1] as [number,number,number] },
-  // Drape below spine
-  { pos: [-1.5, -4, -5] as [number,number,number], rot: [-0.1, 0,  0.2] as [number,number,number], scale: [1, 3.0, 1] as [number,number,number] },
-  { pos: [ 1.5, -4, -5] as [number,number,number], rot: [-0.1, 0, -0.2] as [number,number,number], scale: [1, 3.0, 1] as [number,number,number] },
-]
-
+// ─── Chains ───────────────────────────────────────────────────────────────────
 function Chains() {
   const { scene } = useGLTF("/models/assets/chain.glb")
   const groupRef  = useRef<THREE.Group>(null!)
 
-  useLayoutEffect(() => {
-    applyChainMaterial(scene)
-  }, [scene])
+  useLayoutEffect(() => { applyChainMaterial(scene) }, [scene])
 
   useFrame(() => {
     if (!groupRef.current) return
-    const scroll = window.scrollY / window.innerHeight
-    groupRef.current.position.y = THREE.MathUtils.lerp(
-      groupRef.current.position.y,
-      scroll * 3.5,
-      0.05
-    )
+    const s = window.scrollY / window.innerHeight
+    setY(groupRef.current, s * 3.5)
+    lerpRotY(groupRef.current, s * Math.PI * 0.06)
   })
 
   return (
     <group ref={groupRef}>
-      {/* ── Single chain, scaled and positioned to wrap around spine ── */}
-      <primitive
-        object={scene}
-        position={[0, -26.5, 0]}   // centered on spine
-        rotation={[0, 0, 0]}
-        scale={1.5}
-      />
+      <primitive object={scene} position={[-0.2, -26.5, -0.2]} rotation={[0, 0, 0]} scale={1.5} />
     </group>
   )
 }
 
 // ─── Scene3 ───────────────────────────────────────────────────────────────────
-
 export default function Scene3() {
-  const groupRef = useRef<THREE.Group>(null!)
-
-  // useFrame(() => {
-  //   if (!groupRef.current) return
-  //   const scroll = window.scrollY / window.innerHeight
-  //   groupRef.current.visible = scroll > 0.9
-  // })
-
   return (
-    <group ref={groupRef}>
+    <group>
       <Spine />
+      <Flowers />
       <Chains />
       <Plates />
     </group>

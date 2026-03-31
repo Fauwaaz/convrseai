@@ -15,6 +15,7 @@ import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import Scene2 from "../components/Scenes/Scene2";
 import Nature from "../components/Scenes/assets/Nature";
 import Scene3 from "../components/Scenes/Scene3";
+import Scene4 from "../components/Scenes/Scene4";
 
 function ScrollController({ children }) {
   const group = useRef()
@@ -60,7 +61,7 @@ export default function Main() {
           <ambientLight intensity={0.005} color="#000000" />
 
           {/* ── CENTER CORE — white-green emit from logo position ─────────── */}
-          <pointLight position={[0, 0.5, 1]} intensity={6} color="#ccffdd" distance={10} decay={2} />
+          <pointLight position={[0, 0.5, 1]} intensity={20} color="#ccffdd" distance={10} decay={2} />
           <pointLight position={[0, 0, 0]} intensity={3} color="#ffffff" distance={5} decay={2.5} />
 
           {/* ── GROUND POOL — warm yellow-green, lights trees from below ──── */}
@@ -70,6 +71,12 @@ export default function Main() {
           {/* ── TREE SIDE FILL — very dim green, just enough to see shape ─── */}
           <pointLight position={[-5, -1, -2]} intensity={2} color="#224400" distance={12} decay={2} />
           <pointLight position={[5, -1, -2]} intensity={2} color="#224400" distance={12} decay={2} />
+
+          {/* Gold ground — this is what gives fog its warm amber color */}
+          <pointLight position={[0, -3, 0]} intensity={18} color="#ffaa22" distance={14} decay={1.5} />
+
+          {/* Teal center — fog in mid layer picks this up */}
+          <pointLight position={[0, 0, 0]} intensity={10} color="#00ffcc" distance={16} decay={1.2} />
 
           {/* ── NO directional lights — pure point source look ───────────── */}
 
@@ -125,7 +132,15 @@ export default function Main() {
 
       <div style={{ height: "200vh" }} />
       <Scene2 />
-      <div style={{ height: "350vh" }} />
+      <div style={{ height: "250vh" }} />
+      {/* <div style={{
+        position: "relative",
+        zIndex: 20,
+        backgroundColor: "#000000",
+      }}>
+        <Scene4 />
+      </div>
+      <div style={{ height: "300vh" }} /> */}
     </>
   );
 }
