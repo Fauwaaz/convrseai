@@ -172,7 +172,14 @@ export default function Main() {
           <fog attach="fog" args={["#000000", 5, 22]} />
 
           <Environment preset="city" background={false} />
-
+          
+          <EffectComposer>
+            {!isMobile && <Bloom
+              intensity={0.5}
+              kernelSize={3}
+            />}
+          </EffectComposer>
+          
           <ScrollController>
             <Scene1 />
             <Scene3 />
