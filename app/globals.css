@@ -108,22 +108,24 @@ body {
   pointer-events: none;
 }
 
+/* 
 canvas {
   position: fixed;
   inset: 0;
   z-index: 5;
-}
+} */
 
 .scene2-root {
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: 160vh;
   z-index: 20;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  backdrop-filter: blur(180px);
+  background: #ffffff;
+  background: linear-gradient(177deg, rgba(255, 255, 255, 0) 20%, rgba(0, 0, 0, 1) 20%, rgba(0, 0, 0, 1) 80%, rgba(255, 255, 255, 0) 80%);
 }
 
 /* center brightness mask */
@@ -131,27 +133,20 @@ canvas {
   content: "";
   position: absolute;
   inset: 0;
-
-  background: radial-gradient(circle at center,
-      rgba(0, 0, 0, 0) 0%,
-      rgba(0, 0, 0, 0) 40%,
-      rgba(0, 0, 0, 0.35) 70%,
-      rgba(0, 0, 0, 0.7) 100%);
-
   pointer-events: none;
 }
 
 
 .scene2-panel {
-
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
+  /* backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px); */
   position: relative;
+  overflow: hidden !important;
 }
 
 .scene2-inner {
@@ -162,6 +157,15 @@ canvas {
   align-items: flex-end;
   justify-content: center;
   gap: 20px;
+}
+
+.scene2-canvas {
+  position: absolute;
+  inset: 0;
+  /* transform: translateY(20%); */
+  height: 100%;
+  width: 100%;
+  z-index: 2;
 }
 
 .scene2-title {
@@ -193,13 +197,4 @@ canvas {
   z-index: 3;
   pointer-events: none;
 
-}
-
-.scene2-canvas {
-  position: absolute;
-  inset: 0;
-  /* transform: translateY(20%); */
-  height: 100%;
-  width: 100%;
-  z-index: 2;
 }

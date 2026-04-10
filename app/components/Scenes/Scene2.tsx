@@ -94,12 +94,11 @@ export default function Scene2() {
           </h1>
 
           <div className="scene2-canvas">
-            <Canvas camera={{ position: [0, 0, 5], fov: 32 }}>
+            <Canvas camera={{ position: [0, 0, 8], fov: 32 }}>
               <ambientLight intensity={0.8} />
 
               <directionalLight position={[12, 5, 5]} intensity={50} />
               <directionalLight position={[-5, -25, -5]} intensity={20} />
-
 
               <ScrollController>
                 <LogoMesh />

@@ -170,7 +170,7 @@ function Flowers() {
 
 // ─── Plates ───────────────────────────────────────────────────────────────────
 const PLATE_CONFIGS = [
-  { pos: [-0.3, -21, 0.5] as [number, number, number], rot: [0, -1.2, 0.01] as [number, number, number], tint: "#7a5a20", scale: 1 },
+  { pos: [-0.3, -22, 0.5] as [number, number, number], rot: [0, -1.2, 0.01] as [number, number, number], tint: "#7a5a20", scale: 1 },
   // { pos: [ 3.2,  0.5, -0.5] as [number,number,number], rot: [0, -0.4,  0.06] as [number,number,number], tint: "#0a4a6a", scale: 1.3 },
   // { pos: [-3.8, -2.5, -0.8] as [number,number,number], rot: [0,  0.2,  0.04] as [number,number,number], tint: "#3a0a5a", scale: 1.1 },
   // { pos: [ -0.5,  -24.5, 0]   as [number,number,number], rot: [0, 0, 0] as [number,number,number], tint: "#0a2a4a", scale: 1.2 },

@@ -30,27 +30,27 @@ function ScrollController({ children }) {
 
 // ─── Tune these ───────────────────────────────────────────────────────────────
 const LIGHT_CONFIG = {
-  interval:    10,      // seconds between each pulse
-  duration:    5,    // seconds the pulse takes (rise + fall)
+  interval: 10,      // seconds between each pulse
+  duration: 5,    // seconds the pulse takes (rise + fall)
   lights: [
-    { low: 5,  high: 80  },   // center core green
-    { low: 1,   high: 6   },   // center white
-    { low: 6,   high: 22  },   // ground pool yellow-green
-    { low: 3,   high: 14  },   // ground pool 2
-    { low: 0.5, high: 4   },   // tree fill left
-    { low: 0.5, high: 4   },   // tree fill right
-    { low: 8,   high: 30  },   // gold ground
-    { low: 4,   high: 18  },   // teal center
+    { low: 5, high: 80 },   // center core green
+    { low: 1, high: 6 },   // center white
+    { low: 6, high: 22 },   // ground pool yellow-green
+    { low: 3, high: 14 },   // ground pool 2
+    { low: 0.5, high: 4 },   // tree fill left
+    { low: 0.5, high: 4 },   // tree fill right
+    { low: 8, high: 30 },   // gold ground
+    { low: 4, high: 18 },   // teal center
   ]
 }
 
 function SceneLights() {
-  const coreGreen  = useRef(null)
-  const coreWhite  = useRef(null)
-  const groundYG   = useRef(null)
-  const groundYG2  = useRef(null)
-  const treeFillL  = useRef(null)
-  const treeFillR  = useRef(null)
+  const coreGreen = useRef(null)
+  const coreWhite = useRef(null)
+  const groundYG = useRef(null)
+  const groundYG2 = useRef(null)
+  const treeFillL = useRef(null)
+  const treeFillR = useRef(null)
   const goldGround = useRef(null)
   const tealCenter = useRef(null)
 
@@ -60,24 +60,24 @@ function SceneLights() {
   ]
 
   const lastFired = useRef(0)
-  const pulsing   = useRef(false)
-  const pulseT    = useRef(0)
+  const pulsing = useRef(false)
+  const pulseT = useRef(0)
 
   useFrame(({ clock }) => {
     const elapsed = clock.getElapsedTime()
-    const cfg     = LIGHT_CONFIG
+    const cfg = LIGHT_CONFIG
 
     if (!pulsing.current && elapsed - lastFired.current >= cfg.interval) {
       pulsing.current = true
-      pulseT.current  = 0
+      pulseT.current = 0
       lastFired.current = elapsed
     }
 
     if (pulsing.current) {
       pulseT.current += 1 / 60
 
-      const t        = Math.min(pulseT.current / cfg.duration, 1)
-      const bell     = Math.sin(t * Math.PI)
+      const t = Math.min(pulseT.current / cfg.duration, 1)
+      const bell = Math.sin(t * Math.PI)
 
       refs.forEach((ref, i) => {
         if (!ref.current) return
@@ -96,14 +96,14 @@ function SceneLights() {
 
   return (
     <>
-      <pointLight ref={coreGreen}  position={[0,  -2,  0]} intensity={LIGHT_CONFIG.lights[0].low} color="#ccffdd" distance={10} decay={2}   />
-      <pointLight ref={coreWhite}  position={[0,   0,  0]} intensity={LIGHT_CONFIG.lights[1].low} color="#ffffff"  distance={5}  decay={2.5} />
-      <pointLight ref={groundYG}   position={[0,  -3,  0]} intensity={LIGHT_CONFIG.lights[2].low} color="#aaff00"  distance={12} decay={1.5} />
-      <pointLight ref={groundYG2}  position={[0,  -5, -1]} intensity={LIGHT_CONFIG.lights[3].low} color="#88cc00"  distance={18} decay={1.2} />
-      <pointLight ref={treeFillL}  position={[-5, -1, -2]} intensity={LIGHT_CONFIG.lights[4].low} color="#224400"  distance={12} decay={2}   />
-      <pointLight ref={treeFillR}  position={[5,  -1, -2]} intensity={LIGHT_CONFIG.lights[5].low} color="#224400"  distance={12} decay={2}   />
-      <pointLight ref={goldGround} position={[0,  -3,  0]} intensity={LIGHT_CONFIG.lights[6].low} color="#ffaa22"  distance={14} decay={1.5} />
-      <pointLight ref={tealCenter} position={[0,   0,  0]} intensity={LIGHT_CONFIG.lights[7].low} color="#00ffcc"  distance={16} decay={1.2} />
+      <pointLight ref={coreGreen} position={[0, -2, 0]} intensity={LIGHT_CONFIG.lights[0].low} color="#ccffdd" distance={10} decay={2} />
+      <pointLight ref={coreWhite} position={[0, 0, 0]} intensity={LIGHT_CONFIG.lights[1].low} color="#ffffff" distance={5} decay={2.5} />
+      <pointLight ref={groundYG} position={[0, -3, 0]} intensity={LIGHT_CONFIG.lights[2].low} color="#aaff00" distance={12} decay={1.5} />
+      <pointLight ref={groundYG2} position={[0, -5, -1]} intensity={LIGHT_CONFIG.lights[3].low} color="#88cc00" distance={18} decay={1.2} />
+      <pointLight ref={treeFillL} position={[-5, -1, -2]} intensity={LIGHT_CONFIG.lights[4].low} color="#224400" distance={12} decay={2} />
+      <pointLight ref={treeFillR} position={[5, -1, -2]} intensity={LIGHT_CONFIG.lights[5].low} color="#224400" distance={12} decay={2} />
+      <pointLight ref={goldGround} position={[0, -3, 0]} intensity={LIGHT_CONFIG.lights[6].low} color="#ffaa22" distance={14} decay={1.5} />
+      <pointLight ref={tealCenter} position={[0, 0, 0]} intensity={LIGHT_CONFIG.lights[7].low} color="#00ffcc" distance={16} decay={1.2} />
     </>
   )
 }
@@ -117,21 +117,21 @@ export default function Main() {
     const checkDevice = () => {
       const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
       const lowEnd = mobile && (window.innerWidth < 768 || /Android [1-4]|iPhone OS [1-8]/.test(navigator.userAgent))
-      
+
       setIsMobile(mobile)
       setIsLowEnd(lowEnd)
     }
-    
+
     checkDevice()
     window.addEventListener('resize', checkDevice)
-    
+
     return () => window.removeEventListener('resize', checkDevice)
   }, [])
 
   // Disable expensive features on mobile
   const canvasProps = {
     camera: { position: [0, 0, 5], fov: isMobile ? 50 : 40 },
-    gl: { 
+    gl: {
       alpha: true,
       powerPreference: "low-power",
       antialias: !isLowEnd,
@@ -156,6 +156,20 @@ export default function Main() {
       <div
         style={{
           position: "fixed",
+          inset: 0, // replaces top/left/width/height
+          zIndex: -1, // stays behind everything
+
+          backgroundImage: "url(/textures/convrse-bg.avif)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+
+          pointerEvents: "none", // don't block clicks
+        }}
+      />
+      <div
+        style={{
+          position: "fixed",
           inset: 0,
           zIndex: 15,
           pointerEvents: "auto"
@@ -167,19 +181,19 @@ export default function Main() {
 
           {/* Reduce light count on mobile */}
           {!isLowEnd && <SceneLights />}
-          
+
           {/* Fog — pure black, close start so edges fall off fast */}
           <fog attach="fog" args={["#000000", 5, 22]} />
 
           <Environment preset="city" background={false} />
-          
+
           <EffectComposer>
             {!isMobile && <Bloom
               intensity={0.5}
               kernelSize={3}
             />}
           </EffectComposer>
-          
+
           <ScrollController>
             <Scene1 />
             <Scene3 />
@@ -199,8 +213,14 @@ export default function Main() {
 
       {/* Reduced height for mobile */}
       <div style={{ height: isMobile ? "100vh" : "200vh" }} />
-      <Scene2 /> 
-      <div style={{ height: isMobile ? "100vh" : "200vh" }} />  
+      <Scene2 />
+      <div style={{ height: isMobile ? "100vh" : "120vh" }} />
+
+      {/* Scene4 — sticky scroll section, covers fixed canvas */}
+      <div style={{ position: "relative", zIndex: 20 }}>
+        <Scene4 />
+      </div>
+
     </>
   );
 }

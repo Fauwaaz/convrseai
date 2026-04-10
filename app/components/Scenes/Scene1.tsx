@@ -180,54 +180,55 @@ function FogVolume() {
   )
 }
 
+// ─── Scroll state — shared lerped value ──────────────────────────────────────
+let _rawScroll = 0
+let _lerpedScroll = 0
+if (typeof window !== "undefined")
+  window.addEventListener("scroll", () => { _rawScroll = window.scrollY / window.innerHeight }, { passive: true })
+
+// Call once per frame to advance the lerped scroll
+function tickLerpedScroll(alpha = 0.08) {
+  _lerpedScroll += (_rawScroll - _lerpedScroll) * alpha
+  return _lerpedScroll
+}
+
 // ─── Nature ───────────────────────────────────────────────────────────────────
 function Nature() {
-  const { scene: treeSceneA } = useGLTF("/models/assets/tree.glb")
-  const { scene: treeSceneB } = useGLTF("/models/assets/tree.glb")
+  const { scene: treeSceneA }  = useGLTF("/models/assets/tree.glb")
+  const { scene: treeSceneB }  = useGLTF("/models/assets/tree.glb")
   const { scene: grassSceneA } = useGLTF("/models/assets/grass.glb")
   const { scene: grassSceneB } = useGLTF("/models/assets/grass.glb")
 
-  const backTreeRef = useRef<THREE.Group>(null!)
-  const frontTreeRef = useRef<THREE.Group>(null!)
-  const backGrassRef = useRef<THREE.Group>(null!)
+  const backTreeRef   = useRef<THREE.Group>(null!)
+  const frontTreeRef  = useRef<THREE.Group>(null!)
+  const backGrassRef  = useRef<THREE.Group>(null!)
   const frontGrassRef = useRef<THREE.Group>(null!)
 
   useLayoutEffect(() => {
-    applyMat(treeSceneA, NATURE_MAT, 10)
+    applyMat(treeSceneA,  NATURE_MAT, 10)
     applyMat(grassSceneA, NATURE_MAT, 0)
-    applyMat(treeSceneB, NATURE_MAT, 20)
+    applyMat(treeSceneB,  NATURE_MAT, 20)
     applyMat(grassSceneB, NATURE_MAT, 20)
   }, [treeSceneA, treeSceneB, grassSceneA, grassSceneB])
 
   useFrame(() => {
-    const s = getScroll()
+    // ── Shared lerped scroll — same value as particles ────────────────────
+    const s = tickLerpedScroll(0.06)
 
-    // ── Position — no lerp, tracks scroll exactly ─────────────────────────
-    if (backTreeRef.current) setY(backTreeRef.current, s * 6)
-    if (frontTreeRef.current) setY(frontTreeRef.current, s * 7)
-    if (backGrassRef.current) setY(backGrassRef.current, s * 3)
+    if (backTreeRef.current)   setY(backTreeRef.current,   s * 6)
+    if (frontTreeRef.current)  setY(frontTreeRef.current,  s * 7)
+    if (backGrassRef.current)  setY(backGrassRef.current,  s * 3)
     if (frontGrassRef.current) setY(frontGrassRef.current, s * 3)
 
-    // ── Rotation — lerped for smooth horizontal turn ───────────────────────
-    const rotTarget = s * Math.PI    // subtle rotation as you scroll
-    if (backTreeRef.current) lerpRotY(backTreeRef.current, Math.PI * 0.3 + rotTarget)
-    if (frontTreeRef.current) lerpRotY(frontTreeRef.current, -Math.PI * 0.3 + rotTarget)
-    if (backGrassRef.current) lerpRotY(backGrassRef.current, Math.PI * 0.1 + rotTarget)
-    if (frontGrassRef.current) lerpRotY(frontGrassRef.current, -Math.PI * 0.1 + rotTarget)
+    const rotTarget = s * Math.PI
+    if (backTreeRef.current)   lerpRotY(backTreeRef.current,   Math.PI *  0.3 + rotTarget)
+    if (frontTreeRef.current)  lerpRotY(frontTreeRef.current,  Math.PI * -0.1 + rotTarget)
+    if (backGrassRef.current)  lerpRotY(backGrassRef.current,  Math.PI *  0.1 + rotTarget)
+    if (frontGrassRef.current) lerpRotY(frontGrassRef.current, Math.PI * -0.1 + rotTarget)
   })
-
 
   return (
     <>
-      {/* <group ref={backTreeRef}>
-        <primitive object={treeSceneA} position={[1, -9, 3.5]} rotation={[0, Math.PI * 0.3, 0]} scale={0.7} />
-      </group> */}
-      {/* <group ref={backGrassRef}>
-        <primitive object={grassSceneA} position={[-1.8, -4, -0.5]} rotation={[0, Math.PI * 0.1, 0]} scale={0.6} />
-      </group> */}
-      {/* <group ref={frontTreeRef}>
-        <primitive object={treeSceneB} position={[2.1, -9, -5]} rotation={[0, -Math.PI * 0.3, 0]} scale={0.5} />
-      </group> */}
       <group ref={frontGrassRef}>
         <primitive object={grassSceneB} position={[0, -4, 0.5]} rotation={[0, -Math.PI * 0.1, 0]} scale={0.6} />
       </group>
@@ -236,7 +237,7 @@ function Nature() {
 }
 
 // ─── Tune these ───────────────────────────────────────────────────────────────
-const PARTICLES_POSITION = [-1, -4, 0] as const
+const PARTICLES_POSITION = [-4.3, -4, -1] as const
 const PARTICLES_SCALE = 0.35
 const PARTICLES_ROTATION = [0, 0, 0] as const
 const PARTICLES_SCROLL_SPEED = 0.5         // how fast it drops on scroll — tune this
@@ -246,11 +247,10 @@ function RandomParticles() {
   const groupRef = useRef<THREE.Group>(null!)
   const groupRef2 = useRef<THREE.Group>(null!)
 
-  // Shared emissive material — responds to scene lights + has own glow
   const mat = useMemo(() => new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color("#1a3010"),
-    emissive: new THREE.Color("#298013"),  // subtle self-glow
-    emissiveIntensity: 0.4,                        // low — just enough ambient feel
+    color: new THREE.Color("#1a3010"), // #86868675
+    emissive: new THREE.Color("#2a9013"), // #86868675
+    emissiveIntensity: 0.4,
     roughness: 0.9,
     metalness: 1,
     transmission: 0.95,
@@ -260,13 +260,12 @@ function RandomParticles() {
     opacity: 1,
     depthWrite: false,
     side: THREE.DoubleSide,
-    envMapIntensity: 0.8,                          // picks up scene point lights
+    envMapIntensity: 0.8,
   }), [])
 
-  // Slightly different material for second layer to add depth
   const mat2 = useMemo(() => new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color("#1f3a10"),
-    emissive: new THREE.Color("#2a9013"),
+    color: new THREE.Color("#1a3010"), // #86868675
+    emissive: new THREE.Color("#2a9013"), // #86868675
     emissiveIntensity: 0.35,
     roughness: 0.85,
     metalness: 1,
@@ -281,7 +280,6 @@ function RandomParticles() {
   }), [])
 
   useLayoutEffect(() => {
-    // Apply material to first instance
     scene.traverse((child: any) => {
       if (!child.isMesh) return
       child.material = mat
@@ -291,7 +289,6 @@ function RandomParticles() {
     })
   }, [scene, mat])
 
-  // Clone scene for second instance
   const clonedScene = useMemo(() => {
     const clone = scene.clone()
     clone.traverse((child: any) => {
@@ -305,31 +302,29 @@ function RandomParticles() {
   }, [scene, mat2])
 
   useFrame(({ clock }) => {
-    if (!groupRef.current) return
     const t = clock.getElapsedTime()
-    const scroll = window.scrollY / window.innerHeight
+    // ── Use shared lerped scroll — smooth, matches Nature ─────────────────
+    const s = tickLerpedScroll(0.001)
 
-    // ── Scroll — moves DOWN as user scrolls (positive Y scroll = negative screen) ──
-    const scrollY = PARTICLES_POSITION[1] - scroll * PARTICLES_SCROLL_SPEED - 0.5
+    const scrollY = PARTICLES_POSITION[1] - s * PARTICLES_SCROLL_SPEED
 
-    // ── First layer (main particles) ──────────────────────────────────────
-    groupRef.current.position.x = PARTICLES_POSITION[0] + Math.sin(t * 0.08) * 0.3
-    groupRef.current.position.y = scrollY + Math.sin(t * 0.06) * 0.2
-    groupRef.current.position.z = PARTICLES_POSITION[2]
-    groupRef.current.rotation.y = PARTICLES_ROTATION[1] + Math.sin(t * 0.04) * 0.05
-    groupRef.current.rotation.z = PARTICLES_ROTATION[2] + Math.sin(t * 0.05) * 0.02
+    if (groupRef.current) {
+      groupRef.current.position.x = PARTICLES_POSITION[0] + Math.sin(t * 0.08) * 0.3
+      groupRef.current.position.y = scrollY + Math.sin(t * 0.06) * 0.2
+      groupRef.current.position.z = PARTICLES_POSITION[2]
+      groupRef.current.rotation.y = PARTICLES_ROTATION[1] + Math.sin(t * 0.04) * 0.05
+      groupRef.current.rotation.z = PARTICLES_ROTATION[2] + Math.sin(t * 0.05) * 0.02
+    }
 
-    // ── Second layer (offset for density) ────────────────────────────────
     if (groupRef2.current) {
       groupRef2.current.position.x = PARTICLES_POSITION[0] + Math.sin(t * 0.09 + 1.2) * 0.28
       groupRef2.current.position.y = scrollY + Math.sin(t * 0.07 + 0.8) * 0.18
-      groupRef2.current.position.z = PARTICLES_POSITION[2] - 0.05  // slight Z offset
+      groupRef2.current.position.z = PARTICLES_POSITION[2] - 0.05
       groupRef2.current.rotation.y = PARTICLES_ROTATION[1] + Math.sin(t * 0.045 + 1.5) * 0.045
       groupRef2.current.rotation.z = PARTICLES_ROTATION[2] + Math.sin(t * 0.055 + 0.9) * 0.018
       groupRef2.current.rotation.x = Math.sin(t * 0.03) * 0.02
     }
 
-    // ── Emissive pulse — breathes slowly like ambient light ──────────────────
     mat.emissiveIntensity = 0.3 + Math.sin(t * 0.5) * 0.15
     mat2.emissiveIntensity = 0.28 + Math.sin(t * 0.52 + 0.5) * 0.14
   })
@@ -337,20 +332,10 @@ function RandomParticles() {
   return (
     <>
       <group ref={groupRef}>
-        <primitive
-          object={scene}
-          position={[0, 0, 0]}
-          scale={PARTICLES_SCALE}
-          rotation={PARTICLES_ROTATION}
-        />
+        <primitive object={scene} position={[0, 0, 0]} scale={PARTICLES_SCALE} rotation={PARTICLES_ROTATION} />
       </group>
       <group ref={groupRef2}>
-        <primitive
-          object={clonedScene}
-          position={[0, 0, 0]}
-          scale={PARTICLES_SCALE * 0.98}  // Slightly different scale for depth
-          rotation={PARTICLES_ROTATION}
-        />
+        <primitive object={clonedScene} position={[0, 0, 0]} scale={PARTICLES_SCALE * 0.98} rotation={PARTICLES_ROTATION} />
       </group>
     </>
   )
@@ -359,7 +344,7 @@ function RandomParticles() {
 // function Jelly() {
 //   const { scene } = useGLTF("/models/assets/jelly.glb")
 //   const groupRef = useRef<THREE.Group>(null!)
-  
+
 //   // Animation state
 //   const stateRef = useRef({
 //     isAnimating: false,
@@ -396,7 +381,7 @@ function RandomParticles() {
 //     // Start animation loop
 //     const animateJelly = () => {
 //       const state = stateRef.current
-      
+
 //       if (!state.isAnimating) {
 //         // Start new animation with random X position
 //         state.isAnimating = true
@@ -405,16 +390,16 @@ function RandomParticles() {
 //         state.startY = -3
 //         state.endY = 3
 //       }
-      
+
 //       if (state.isAnimating) {
 //         // Update progress
 //         state.progress += 0.008 // Speed of animation
-        
+
 //         if (state.progress >= 1) {
 //           // Animation complete, reset
 //           state.isAnimating = false
 //           state.progress = 0
-          
+
 //           // Update material opacity to fully transparent
 //           if (groupRef.current) {
 //             groupRef.current.traverse((child: any) => {
@@ -423,7 +408,7 @@ function RandomParticles() {
 //               }
 //             })
 //           }
-          
+
 //           // Schedule next animation after random delay (1-3 seconds)
 //           const delay = 1000 + Math.random() * 2000
 //           setTimeout(() => {
@@ -433,14 +418,14 @@ function RandomParticles() {
 //           }, delay)
 //           return
 //         }
-        
+
 //         // Calculate current Y position (easing for smoother motion)
 //         const easeInOut = state.progress < 0.5
 //           ? 2 * state.progress * state.progress
 //           : 1 - Math.pow(-2 * state.progress + 2, 2) / 2
-        
+
 //         const currentY = state.startY + (state.endY - state.startY) * easeInOut
-        
+
 //         // Calculate opacity (fade in at start, fade out at end)
 //         let opacity = 0
 //         if (state.progress < 0.2) {
@@ -453,7 +438,7 @@ function RandomParticles() {
 //           // Full opacity in middle
 //           opacity = 1
 //         }
-        
+
 //         // Apply opacity to material
 //         if (groupRef.current) {
 //           groupRef.current.traverse((child: any) => {
@@ -465,7 +450,7 @@ function RandomParticles() {
 //             }
 //           })
 //         }
-        
+
 //         // Update position
 //         if (groupRef.current) {
 //           groupRef.current.position.x = state.targetX
@@ -475,12 +460,12 @@ function RandomParticles() {
 //         }
 //       }
 //     }
-    
+
 //     // Start the first animation after a short delay
 //     const timeout = setTimeout(() => {
 //       animateJelly()
 //     }, 500)
-    
+
 //     // Set up interval for continuous animation checks
 //     const interval = setInterval(() => {
 //       const state = stateRef.current
@@ -488,7 +473,7 @@ function RandomParticles() {
 //         animateJelly()
 //       }
 //     }, 16) // ~60fps
-    
+
 //     return () => {
 //       clearTimeout(timeout)
 //       clearInterval(interval)
