@@ -153,7 +153,7 @@ export default function Main() {
 
   return (
     <>
-      {/* <div
+      <div
         style={{
           position: "fixed",
           inset: 0, // replaces top/left/width/height
@@ -166,7 +166,7 @@ export default function Main() {
 
           pointerEvents: "none", // don't block clicks
         }}
-      /> */}
+      />
       <div
         style={{
           position: "fixed",
