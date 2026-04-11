@@ -213,7 +213,7 @@ function Nature() {
 
   useFrame(() => {
     // ── Shared lerped scroll — same value as particles ────────────────────
-    const s = tickLerpedScroll(1)
+    const s = tickLerpedScroll(0.6)
 
     if (backTreeRef.current)   setY(backTreeRef.current,   s * 6)
     if (frontTreeRef.current)  setY(frontTreeRef.current,  s * 7)

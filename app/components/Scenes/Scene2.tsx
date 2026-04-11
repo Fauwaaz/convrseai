@@ -7,6 +7,7 @@ import { useGLTF } from "@react-three/drei"
 import { useLayoutEffect, useRef } from "react"
 import * as THREE from "three"
 import { Bloom, EffectComposer } from "@react-three/postprocessing"
+import Image from "next/image"
 
 // ✅ Fix 3: type children properly
 function ScrollController({ children }: { children: React.ReactNode }) {
@@ -82,9 +83,20 @@ function LogoMesh() {
 export default function Scene2() {
   return (
     <section
-      className="scene2-root"
+      className="scene2-root relative"
       style={{ fontFamily: "var(--font-crystal), sans-serif" }}
     >
+
+      {/* <div className="absolute top-0 w-full">
+        <Image
+          src="/textures/line.png"
+          alt="Line 1"
+          width={2560}
+          height={1080}
+          className="line1 absolute top-45 left-0 w-full h-auto transform -rotate-5"
+        />
+      </div> */}
+
       <div className="scene2-panel">
         <motion.div className="scene2-inner">
           <h1 className="scene2-title">
