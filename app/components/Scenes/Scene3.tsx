@@ -98,14 +98,14 @@ function lerpRotY(g: THREE.Group, target: number, alpha = 0.06) {
     g.rotation.y += (target - g.rotation.y) * alpha
 }
 
-// ─── Spine ────────────────────────────────────────────────────────────────────
-const SPINE_POSITION = new THREE.Vector3(0, -24, -1.4)  // x=left/right, y=up/down, z=front/back
+// ─── Spine ───────────────────────────────────────────────────────────────────
+const SPINE_POSITION = new THREE.Vector3(0.6, -26, 0.6)  // x=left/right, y=up/down, z=front/back
 const SPINE_ROTATION = new THREE.Euler(0, 0, 0)        // x/y/z rotation in radians
 const SPINE_SCALE    = 1.7
 const SPINE_SCROLL_SPEED = 5                           // how fast it moves on scroll
 
 function Spine() {
-  const { scene } = useGLTF("/models/assets/spine.gltf")
+  const { scene } = useGLTF("/models/assets/building.glb")
   const groupRef  = useRef<THREE.Group>(null!)
 
   useLayoutEffect(() => {
@@ -170,7 +170,7 @@ function Flowers() {
 
 // ─── Plates ───────────────────────────────────────────────────────────────────
 const PLATE_CONFIGS = [
-  { pos: [-0.3, -22, 0.5] as [number, number, number], rot: [0, -1.2, 0.01] as [number, number, number], tint: "#7a5a20", scale: 1 },
+  { pos: [-0.3, -22, 1] as [number, number, number], rot: [0, -1.6, 0.01] as [number, number, number], tint: "#7a5a20", scale: 0.8 },
   // { pos: [ 3.2,  0.5, -0.5] as [number,number,number], rot: [0, -0.4,  0.06] as [number,number,number], tint: "#0a4a6a", scale: 1.3 },
   // { pos: [-3.8, -2.5, -0.8] as [number,number,number], rot: [0,  0.2,  0.04] as [number,number,number], tint: "#3a0a5a", scale: 1.1 },
   // { pos: [ -0.5,  -24.5, 0]   as [number,number,number], rot: [0, 0, 0] as [number,number,number], tint: "#0a2a4a", scale: 1.2 },
@@ -220,7 +220,7 @@ function Chains() {
 
   return (
     <group ref={groupRef}>
-      <primitive object={scene} position={[0.3, -26.5, -1]} rotation={[0, 0, 0]} scale={1.5} />
+      <primitive object={scene} position={[0.3, -26.5, -0.2]} rotation={[0, 0, 0]} scale={1.5} />
     </group>
   )
 }
@@ -239,9 +239,9 @@ function OuterRings() {
     scene.traverse((child: any) => {
       if (!child.isMesh) return
       child.material = new THREE.MeshPhysicalMaterial({
-        color: new THREE.Color("#d0d8e0"),
-        metalness: 1.0,
-        roughness: 0.05,
+        color: new THREE.Color("#aaccff"),
+        metalness: 0.6,
+        roughness: 0.5,
         clearcoat: 1.0,
         clearcoatRoughness: 0.0,
         reflectivity: 1.0,
@@ -285,7 +285,7 @@ export default function Scene3() {
       <Spine />
       <OuterRings />
       {/* <Flowers /> */}
-      <Chains />
+      {/* <Chains /> */}
       <Plates />
     </group>
   )

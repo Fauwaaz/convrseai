@@ -7,7 +7,7 @@ import * as THREE from "three"
 
 // ─── Materials ────────────────────────────────────────────────────────────────
 const NATURE_MAT = new THREE.MeshPhysicalMaterial({
-  color: new THREE.Color("#1a3010"),   // darker base — light does the work
+  color: new THREE.Color("#89CFF0"),   // darker base — light does the work
   roughness: 0.9,                           // matte — absorbs and scatters
   metalness: 0.0,
   transmission: 0.0,
@@ -248,8 +248,8 @@ function RandomParticles() {
   const groupRef2 = useRef<THREE.Group>(null!)
 
   const mat = useMemo(() => new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color("#1a3010"), // #86868675
-    emissive: new THREE.Color("#2a9013"), // #86868675
+    color: new THREE.Color("#89CFF0"), // #86868675
+    emissive: new THREE.Color("#89CFF0"), // #86868675
     emissiveIntensity: 0.4,
     roughness: 0.9,
     metalness: 1,
@@ -264,8 +264,8 @@ function RandomParticles() {
   }), [])
 
   const mat2 = useMemo(() => new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color("#1a3010"), // #86868675
-    emissive: new THREE.Color("#2a9013"), // #86868675
+    color: new THREE.Color("#89CFF0"), // #86868675
+    emissive: new THREE.Color("#89CFF0"), // #86868675
     emissiveIntensity: 0.35,
     roughness: 0.85,
     metalness: 1,

@@ -97,7 +97,7 @@ function Grass() {
       if (!child.isMesh) return
       const oldMat = child.material
       child.material = new THREE.MeshPhysicalMaterial({
-        color: new THREE.Color("#a8d5a2"),
+        color: new THREE.Color("#aaccff"),
         roughness: 0.05,
         metalness: 0.0,
         transmission: 0.85,

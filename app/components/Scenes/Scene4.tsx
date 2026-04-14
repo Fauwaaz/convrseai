@@ -338,7 +338,7 @@ const LOGO_CFG = {
 const LOGO_MAT = new THREE.MeshPhysicalMaterial({
   color: new THREE.Color("#aaccff"), metalness: 0.0, roughness: 0.0,
   transmission: 0.92, thickness: 1.5, ior: 1.5,
-  transparent: true, opacity: 1.0, envMapIntensity: 3.0,
+  transparent: true, opacity: 0.5, envMapIntensity: 3.0,
   iridescence: 1.0, iridescenceIOR: 1.8,
   iridescenceThicknessRange: [100, 600] as [number, number],
   clearcoat: 1.0, clearcoatRoughness: 0.0,

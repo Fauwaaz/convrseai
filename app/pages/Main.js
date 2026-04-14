@@ -13,6 +13,7 @@ import Scene2 from "../components/Scenes/Scene2";
 import Nature from "../components/Scenes/assets/Nature";
 import Scene3 from "../components/Scenes/Scene3";
 import Scene4 from "../components/Scenes/Scene4";
+import Meteors from "../components/Scenes/assets/Meteors";
 
 function ScrollController({ children }) {
   const group = useRef()
@@ -103,7 +104,7 @@ function SceneLights() {
       <pointLight ref={treeFillL} position={[-5, -1, -2]} intensity={LIGHT_CONFIG.lights[4].low} color="#224400" distance={12} decay={2} />
       <pointLight ref={treeFillR} position={[5, -1, -2]} intensity={LIGHT_CONFIG.lights[5].low} color="#224400" distance={12} decay={2} />
       <pointLight ref={goldGround} position={[0, -3, 0]} intensity={LIGHT_CONFIG.lights[6].low} color="#ffaa22" distance={14} decay={1.5} />
-      <pointLight ref={tealCenter} position={[0, 0, 0]} intensity={LIGHT_CONFIG.lights[7].low} color="#00ffcc" distance={16} decay={1.2} />
+      {/* <pointLight ref={tealCenter} position={[0, 0, 0]} intensity={LIGHT_CONFIG.lights[7].low} color="#00ffcc" distance={16} decay={1.2} /> */}
     </>
   )
 }
@@ -167,6 +168,11 @@ export default function Main() {
           pointerEvents: "none", // don't block clicks
         }}
       />
+      <div className="projector-layer">
+        <video autoPlay loop muted playsInline>
+          <source src="/video/video1.webm" type="video/webm" />
+        </video>
+      </div>
       <div
         style={{
           position: "fixed",
@@ -193,6 +199,8 @@ export default function Main() {
               kernelSize={3}
             />}
           </EffectComposer>
+
+          <Meteors />
 
           <ScrollController>
             <Scene1 />
