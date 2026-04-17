@@ -268,7 +268,7 @@ import { EffectComposer, Bloom } from "@react-three/postprocessing"
 // ─── Tune ALL positions here ──────────────────────────────────────────────────
 const CAMERA = { pos: [0, 0, 5] as const, fov: 32 }
 
-const MODEL_POS = [-1, 5.7, -8] as const   // x=left/right, y=up/down, z=front/back
+const MODEL_POS = [-1, 12.5, -8] as const   // x=left/right, y=up/down, z=front/back
 const MODEL_SCALE = 1.0
 const MODEL_ROT = [-0.03, 0, 0] as const   // radians
 
@@ -382,7 +382,7 @@ function Logo() {
 }
 
 // ─── Model ────────────────────────────────────────────────────────────────────
-function Scene6Model() {
+function  Scene6Model() {
   const { scene } = useGLTF("/models/assets/scene4-all-copy.glb")
   const groupRef = useRef<THREE.Group>(null!)
 

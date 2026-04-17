@@ -229,16 +229,17 @@ export default function Main() {
       {/* Scene4 — sticky scroll section, covers fixed canvas */}
 
       <div style={{ position: "relative", zIndex: 20 }}>
-        <Scene6 />
-      </div>
-
-      <div style={{ position: "relative", zIndex: 20 }}>
         <Scene4 />
       </div>
 
       <div style={{ position: "relative", zIndex: 20 }}>
         <Scene5 />
       </div>
+
+      <div style={{ position: "relative", zIndex: 20 }}>
+        <Scene6 />
+      </div>
+
     </>
   );
 }
