@@ -12,8 +12,10 @@ import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import Scene2 from "../components/Scenes/Scene2";
 import Nature from "../components/Scenes/assets/Nature";
 import Scene3 from "../components/Scenes/Scene3";
-import Scene4 from "../components/Scenes/Scene4";
+import Scene6 from "../components/Scenes/Scene6";
 import Meteors from "../components/Scenes/assets/Meteors";
+import Scene4 from "../components/Scenes/Scene4";
+import Scene5 from "../components/Scenes/Scene5";
 
 function ScrollController({ children }) {
   const group = useRef()
@@ -225,10 +227,18 @@ export default function Main() {
       <div style={{ height: isMobile ? "100vh" : "120vh" }} />
 
       {/* Scene4 — sticky scroll section, covers fixed canvas */}
+
+      <div style={{ position: "relative", zIndex: 20 }}>
+        <Scene6 />
+      </div>
+
       <div style={{ position: "relative", zIndex: 20 }}>
         <Scene4 />
       </div>
 
+      <div style={{ position: "relative", zIndex: 20 }}>
+        <Scene5 />
+      </div>
     </>
   );
 }
