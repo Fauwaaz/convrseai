@@ -268,7 +268,7 @@ import { EffectComposer, Bloom } from "@react-three/postprocessing"
 // ─── Tune ALL positions here ──────────────────────────────────────────────────
 const CAMERA = { pos: [0, 0, 5] as const, fov: 32 }
 
-const MODEL_POS = [-1, 12.5, -8] as const   // x=left/right, y=up/down, z=front/back
+const MODEL_POS = [-1, 13.7, -8] as const   // x=left/right, y=up/down, z=front/back
 const MODEL_SCALE = 1.0
 const MODEL_ROT = [-0.03, 0, 0] as const   // radians
 
@@ -465,7 +465,7 @@ export default function Scene6() {
   const coreLight = useRef<THREE.SpotLight>(null!)
 
   return (
-    <section style={{ position: "relative", width: "100%", height: "120vh", overflow: "hidden", backgroundColor: "#000000" }}>
+    <section style={{ position: "relative", width: "100%", height: "100vh", overflow: "hidden", backgroundColor: "#000000" }}>
       <Canvas
         camera={{ position: CAMERA.pos, fov: CAMERA.fov }}
         gl={{

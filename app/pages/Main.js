@@ -16,6 +16,7 @@ import Scene6 from "../components/Scenes/Scene6";
 import Meteors from "../components/Scenes/assets/Meteors";
 import Scene4 from "../components/Scenes/Scene4";
 import Scene5 from "../components/Scenes/Scene5";
+import Scene7 from "../components/Scenes/Scene7";
 
 function ScrollController({ children }) {
   const group = useRef()
@@ -234,6 +235,10 @@ export default function Main() {
 
       <div style={{ position: "relative", zIndex: 20 }}>
         <Scene5 />
+      </div>
+
+      <div style={{ position: "relative", zIndex: 20 }}>
+        <Scene7 />
       </div>
 
       <div style={{ position: "relative", zIndex: 20 }}>
