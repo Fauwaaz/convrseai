@@ -254,7 +254,7 @@ function SceneLights() {
             <pointLight
                 position={[-0.5, 0, -1]}
                 intensity={50}
-                color="#fff"
+                color="#87CEEB"
                 distance={50}
                 decay={2}
             />
