@@ -100,14 +100,21 @@ function SceneLights() {
 
   return (
     <>
-      <pointLight ref={coreGreen} position={[0, -2, 0]} intensity={LIGHT_CONFIG.lights[0].low} color="#ccffdd" distance={10} decay={2} />
-      <pointLight ref={coreWhite} position={[0, 0, 0]} intensity={LIGHT_CONFIG.lights[1].low} color="#ffffff" distance={5} decay={2.5} />
-      <pointLight ref={groundYG} position={[0, -3, 0]} intensity={LIGHT_CONFIG.lights[2].low} color="#aaff00" distance={12} decay={1.5} />
-      <pointLight ref={groundYG2} position={[0, -5, -1]} intensity={LIGHT_CONFIG.lights[3].low} color="#88cc00" distance={18} decay={1.2} />
-      <pointLight ref={treeFillL} position={[-5, -1, -2]} intensity={LIGHT_CONFIG.lights[4].low} color="#224400" distance={12} decay={2} />
-      <pointLight ref={treeFillR} position={[5, -1, -2]} intensity={LIGHT_CONFIG.lights[5].low} color="#224400" distance={12} decay={2} />
-      <pointLight ref={goldGround} position={[0, -3, 0]} intensity={LIGHT_CONFIG.lights[6].low} color="#ffaa22" distance={14} decay={1.5} />
-      {/* <pointLight ref={tealCenter} position={[0, 0, 0]} intensity={LIGHT_CONFIG.lights[7].low} color="#00ffcc" distance={16} decay={1.2} /> */}
+      {/* Core / Center: Lightest Blue */}
+      <pointLight ref={coreGreen} position={[0, -2, 0]} intensity={LIGHT_CONFIG.lights[0].low} color="#E0F2F7" distance={1} decay={1} />
+      <pointLight ref={coreWhite} position={[0, 0, 0]} intensity={LIGHT_CONFIG.lights[1].low} color="#B3E5FC" distance={5} decay={2.5} />
+
+      {/* Mid-Ground / Teal Tones */}
+      <pointLight ref={tealCenter} position={[0, 0, 0]} intensity={LIGHT_CONFIG.lights[7].low} color="#4FC3F7" distance={16} decay={1.2} />
+
+      {/* Ground / Secondary: Medium Blues */}
+      <pointLight ref={groundYG} position={[0, -3, 0]} intensity={LIGHT_CONFIG.lights[2].low} color="#03A9F4" distance={5} decay={1.5} />
+      <pointLight ref={groundYG2} position={[0, -5, -1]} intensity={LIGHT_CONFIG.lights[3].low} color="#0288D1" distance={10} decay={1.2} />
+      <pointLight ref={goldGround} position={[0, -3, 0]} intensity={LIGHT_CONFIG.lights[6].low} color="#01579B" distance={2} decay={1.5} />
+
+      {/* Outer Fill / Tree Fill: Darkest Blues */}
+      <pointLight ref={treeFillL} position={[-5, -1, -2]} intensity={LIGHT_CONFIG.lights[4].low} color="#0D47A1" distance={5} decay={2} />
+      <pointLight ref={treeFillR} position={[5, -1, -2]} intensity={LIGHT_CONFIG.lights[5].low} color="#0D47A1" distance={5} decay={2} />
     </>
   )
 }

@@ -1,7 +1,9 @@
 "use client"
 
 import Image from "next/image"
-import { useRef, useEffect, useState } from "react"
+import { useRef, useEffect } from "react"
+import Lottie from "lottie-react"
+import animationData from "@/public/video/bg-video.json"
 
 const IMAGES = [
     "/1.avif", "/2.avif", "/3.avif", "/4.avif",
@@ -76,37 +78,52 @@ export default function Scene4() {
             className="relative h-[300vh]"
         >
             <div className="sticky top-0 h-screen overflow-hidden flex items-center bg-black">
-                <div
-                    ref={trackRef}
-                    className="absolute top-0 left-0 h-full flex items-center gap-6 px-16 will-change-transform"
-                >
-                    {IMAGES.map((src, i) => {
-                        const l = LAYOUT[i] || LAYOUT[0]
 
-                        return (
-                            <div
-                                key={i}
-                                className="flex-shrink-0 rounded-lg overflow-hidden"
-                                style={{
-                                    width: l.width,
-                                    height: l.height,
-                                    marginTop: l.marginTop,
-
-                                    // 🔥 subtle depth movement
-                                    transform: `translateY(${Math.sin(offsetRef.current * 0.002 + i) * 10}px)`
-                                }}
-                            >
-                                <Image
-                                    src={src}
-                                    alt=""
-                                    height={l.height}
-                                    width={l.width}
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
-                        )
-                    })}
+                {/* 🔥 Lottie Background */}
+                <div className="absolute inset-0 -top-80 -z-10 opacity-10">
+                    <Lottie
+                        animationData={animationData}
+                        loop
+                        autoplay
+                        className="w-full h-[200vh] object-cover"
+                    />
                 </div>
+
+                {/* YOUR CONTENT */}
+                <div className="relative z-10">
+                    <div
+                        ref={trackRef}
+                        className="absolute top-0 left-0 h-full flex items-center gap-6 px-16 will-change-transform"
+                    >
+                        {IMAGES.map((src, i) => {
+                            const l = LAYOUT[i] || LAYOUT[0]
+
+                            return (
+                                <div
+                                    key={i}
+                                    className="flex-shrink-0 rounded-lg overflow-hidden"
+                                    style={{
+                                        width: l.width,
+                                        height: l.height,
+                                        marginTop: l.marginTop,
+
+                                        // 🔥 subtle depth movement
+                                        transform: `translateY(${Math.sin(offsetRef.current * 0.002 + i) * 10}px)`
+                                    }}
+                                >
+                                    <Image
+                                        src={src}
+                                        alt=""
+                                        height={l.height}
+                                        width={l.width}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                            )
+                        })}
+                    </div>
+                </div>
+
             </div>
         </section>
     )

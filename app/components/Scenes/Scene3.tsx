@@ -102,7 +102,7 @@ function lerpRotY(g: THREE.Group, target: number, alpha = 0.06) {
 const SPINE_POSITION = new THREE.Vector3(0.6, -26, 0.6)  // x=left/right, y=up/down, z=front/back
 const SPINE_ROTATION = new THREE.Euler(0, 0, 0)        // x/y/z rotation in radians
 const SPINE_SCALE    = 1.7
-const SPINE_SCROLL_SPEED = 5                           // how fast it moves on scroll
+const SPINE_SCROLL_SPEED = 5                          // how fast it moves on scroll
 
 function Spine() {
   const { scene } = useGLTF("/models/assets/building.glb")
@@ -170,14 +170,15 @@ function Flowers() {
 
 // ─── Plates ───────────────────────────────────────────────────────────────────
 const PLATE_CONFIGS = [
-  { pos: [-0.3, -22, 1] as [number, number, number], rot: [0, -1.6, 0.01] as [number, number, number], tint: "#7a5a20", scale: 0.8 },
-  // { pos: [ 3.2,  0.5, -0.5] as [number,number,number], rot: [0, -0.4,  0.06] as [number,number,number], tint: "#0a4a6a", scale: 1.3 },
+  { pos: [-0.5, -21.2, 0.5] as [number, number, number], rot: [0, -1.8, 0.01] as [number, number, number], tint: "#7a5a20", scale: 0.8 },
+  { pos: [ -0.6,  -21.7, -0.2] as [number,number,number], rot: [0, -3.2,  0.01] as [number,number,number], tint: "#0a4a6a", scale: 0.8 },
+  { pos: [ 0,  -22.2, 0] as [number,number,number], rot: [0, -4.6,  0.01] as [number,number,number], tint: "#0a4a6a", scale: 0.8 },
   // { pos: [-3.8, -2.5, -0.8] as [number,number,number], rot: [0,  0.2,  0.04] as [number,number,number], tint: "#3a0a5a", scale: 1.1 },
   // { pos: [ -0.5,  -24.5, 0]   as [number,number,number], rot: [0, 0, 0] as [number,number,number], tint: "#0a2a4a", scale: 1.2 },
 ]
 
 function Plates() {
-  const { scene } = useGLTF("/models/assets/plates.glb")
+  const { scene } = useGLTF("/models/assets/plate.glb")
   const groupRef = useRef<THREE.Group>(null!)
 
   const plates = useMemo(() => {

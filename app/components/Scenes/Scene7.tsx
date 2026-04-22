@@ -26,7 +26,7 @@ const ROCK = {
 
 const MAP = {
     pos: [-2, 0.3, -1] as const,
-    scale: 0.6,
+    scale: 0.7,
     rot: [0, 0.4, 0] as const,
 }
 
@@ -63,7 +63,7 @@ function Land() {
             LAND.pos[1] + Math.sin(t * 0.6) * LAND.floatAmp
 
         // ✅ smooth rotation in place (Y axis)
-        ref.current.rotation.y += delta * 0.15
+        // ref.current.rotation.y += delta * 0.15
     })
 
     return (
