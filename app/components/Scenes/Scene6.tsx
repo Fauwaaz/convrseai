@@ -280,12 +280,33 @@ const SCROLL_START_Y = 2
 const SCROLL_DROP = 3.2
 
 // ─── Scroll ───────────────────────────────────────────────────────────────────
-let _s4scroll = 0, _s4dirty = true
-if (typeof window !== "undefined")
-  window.addEventListener("scroll", () => { _s4dirty = true }, { passive: true })
-function getS4Scroll() {
-  if (_s4dirty) { _s4scroll = window.scrollY / window.innerHeight; _s4dirty = false }
-  return _s4scroll
+let _s4target = 0
+let _s4current = 0
+let _s4dirty = true
+
+if (typeof window !== "undefined") {
+  window.addEventListener(
+    "scroll",
+    () => {
+      _s4target = window.scrollY / window.innerHeight
+      _s4dirty = true
+    },
+    { passive: true }
+  )
+}
+
+// 🔥 call this inside useFrame (NOT once)
+export function getS4Scroll() {
+  // easing (lerp)
+  _s4current += (_s4target - _s4current) * 0.5
+
+  // snap when very close (prevents micro jitter)
+  if (Math.abs(_s4target - _s4current) < 0.0001) {
+    _s4current = _s4target
+    _s4dirty = false
+  }
+
+  return _s4current
 }
 
 // ─── Volume fog ───────────────────────────────────────────────────────────────
