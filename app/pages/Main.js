@@ -105,11 +105,11 @@ function SceneLights() {
       <pointLight ref={coreWhite} position={[0, 0, 0]} intensity={LIGHT_CONFIG.lights[1].low} color="#B3E5FC" distance={5} decay={2.5} />
 
       {/* Mid-Ground / Teal Tones */}
-      <pointLight ref={tealCenter} position={[0, 0, 0]} intensity={LIGHT_CONFIG.lights[7].low} color="#4FC3F7" distance={16} decay={1.2} />
+      <pointLight ref={tealCenter} position={[0, 0, 0]} intensity={LIGHT_CONFIG.lights[7].low} color="#4FC3F7" distance={5} decay={1.2} />
 
       {/* Ground / Secondary: Medium Blues */}
       <pointLight ref={groundYG} position={[0, -3, 0]} intensity={LIGHT_CONFIG.lights[2].low} color="#03A9F4" distance={5} decay={1.5} />
-      <pointLight ref={groundYG2} position={[0, -5, -1]} intensity={LIGHT_CONFIG.lights[3].low} color="#0288D1" distance={10} decay={1.2} />
+      <pointLight ref={groundYG2} position={[0, -5, -1]} intensity={LIGHT_CONFIG.lights[3].low} color="#0288D1" distance={5} decay={1.2} />
       <pointLight ref={goldGround} position={[0, -3, 0]} intensity={LIGHT_CONFIG.lights[6].low} color="#01579B" distance={2} decay={1.5} />
 
       {/* Outer Fill / Tree Fill: Darkest Blues */}
@@ -201,7 +201,7 @@ export default function Main() {
           {/* Fog — pure black, close start so edges fall off fast */}
           <fog attach="fog" args={["#000000", 5, 22]} />
 
-          <Environment preset="city" background={false} />
+          <Environment preset="night" background={false} />
 
           <EffectComposer>
             {!isMobile && <Bloom

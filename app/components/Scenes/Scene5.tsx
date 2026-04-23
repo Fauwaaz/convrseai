@@ -2,6 +2,8 @@
 
 import Image from "next/image"
 import { useState } from "react"
+import Lottie from "lottie-react"
+import animationData from "@/public/video/bg-video.json"
 
 const IMAGES = [
   "/1.avif",
@@ -16,6 +18,14 @@ export default function Scene5() {
 
   return (
     <section className="relative h-screen bg-black flex items-center justify-center overflow-hidden">
+      <div className="absolute inset-0 -top-80 -z-10 opacity-10">
+        <Lottie
+          animationData={animationData}
+          loop
+          autoplay
+          className="w-full h-[200vh] object-cover"
+        />
+      </div>
 
       <div className="relative flex items-center justify-center gap-[-120px]">
 

@@ -22,7 +22,7 @@ const NATURE_MAT = new THREE.MeshPhysicalMaterial({
 
 const LOGO_MAT = new THREE.MeshPhysicalMaterial({
   color: new THREE.Color("#ffffff"),  // pure white base
-  metalness: 0.9,
+  metalness: 0.6,
   roughness: 0,
   transmission: 0.0,                         // fully opaque — no glass
   clearcoat: 1.0,
