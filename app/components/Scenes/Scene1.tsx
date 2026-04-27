@@ -87,6 +87,7 @@ function useScrollVisible(threshold = 1000) {
   return visible
 }
 
+
 function FogVolume() {
   const { scene } = useGLTF("/models/assets/fog.glb")
   const g1 = useRef<THREE.Group>(null!)
@@ -194,20 +195,20 @@ function tickLerpedScroll(alpha = 0.08) {
 
 // ─── Nature ───────────────────────────────────────────────────────────────────
 function Nature() {
-  const { scene: treeSceneA }  = useGLTF("/models/assets/tree.glb")
-  const { scene: treeSceneB }  = useGLTF("/models/assets/tree.glb")
+  const { scene: treeSceneA } = useGLTF("/models/assets/tree.glb")
+  const { scene: treeSceneB } = useGLTF("/models/assets/tree.glb")
   const { scene: grassSceneA } = useGLTF("/models/assets/grass.glb")
   const { scene: grassSceneB } = useGLTF("/models/assets/grass.glb")
 
-  const backTreeRef   = useRef<THREE.Group>(null!)
-  const frontTreeRef  = useRef<THREE.Group>(null!)
-  const backGrassRef  = useRef<THREE.Group>(null!)
+  const backTreeRef = useRef<THREE.Group>(null!)
+  const frontTreeRef = useRef<THREE.Group>(null!)
+  const backGrassRef = useRef<THREE.Group>(null!)
   const frontGrassRef = useRef<THREE.Group>(null!)
 
   useLayoutEffect(() => {
-    applyMat(treeSceneA,  NATURE_MAT, 10)
+    applyMat(treeSceneA, NATURE_MAT, 10)
     applyMat(grassSceneA, NATURE_MAT, 0)
-    applyMat(treeSceneB,  NATURE_MAT, 20)
+    applyMat(treeSceneB, NATURE_MAT, 20)
     applyMat(grassSceneB, NATURE_MAT, 20)
   }, [treeSceneA, treeSceneB, grassSceneA, grassSceneB])
 
@@ -215,15 +216,15 @@ function Nature() {
     // ── Shared lerped scroll — same value as particles ────────────────────
     const s = tickLerpedScroll(0.6)
 
-    if (backTreeRef.current)   setY(backTreeRef.current,   s * 6)
-    if (frontTreeRef.current)  setY(frontTreeRef.current,  s * 7)
-    if (backGrassRef.current)  setY(backGrassRef.current,  s * 3)
+    if (backTreeRef.current) setY(backTreeRef.current, s * 6)
+    if (frontTreeRef.current) setY(frontTreeRef.current, s * 7)
+    if (backGrassRef.current) setY(backGrassRef.current, s * 3)
     if (frontGrassRef.current) setY(frontGrassRef.current, s * 3)
 
     const rotTarget = s * Math.PI
-    if (backTreeRef.current)   lerpRotY(backTreeRef.current,   Math.PI *  0.3 + rotTarget)
-    if (frontTreeRef.current)  lerpRotY(frontTreeRef.current,  Math.PI * -0.1 + rotTarget)
-    if (backGrassRef.current)  lerpRotY(backGrassRef.current,  Math.PI *  0.1 + rotTarget)
+    if (backTreeRef.current) lerpRotY(backTreeRef.current, Math.PI * 0.3 + rotTarget)
+    if (frontTreeRef.current) lerpRotY(frontTreeRef.current, Math.PI * -0.1 + rotTarget)
+    if (backGrassRef.current) lerpRotY(backGrassRef.current, Math.PI * 0.1 + rotTarget)
     if (frontGrassRef.current) lerpRotY(frontGrassRef.current, Math.PI * -0.1 + rotTarget)
   })
 
@@ -495,6 +496,7 @@ function Model(props: any) {
   const group = useRef<THREE.Group>(null!)
   const introProgress = useRef(0)
   const introDone = useRef(false)
+  const targetRotation = useRef(0)
 
   useLayoutEffect(() => {
     applyMat(scene, LOGO_MAT, 10)
@@ -513,9 +515,24 @@ function Model(props: any) {
       if (t >= 1) introDone.current = true
       return
     }
-    if (Math.abs(group.current.rotation.y) > 0.0001)
-      group.current.rotation.y *= 0.92
+    // group.current.rotation.y = THREE.MathUtils.lerp(
+    //   group.current.rotation.y,
+    //   targetRotation.current,
+    //   0.08 // 🔥 easing strength
+    // )
   })
+
+  useEffect(() => {
+    const onScroll = () => {
+      const scroll = window.scrollY / window.innerHeight
+
+      // 🔥 control strength here
+      targetRotation.current = scroll * Math.PI * 0.5
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
 
   return (
     <group ref={group} {...props}>
@@ -527,6 +544,7 @@ function Model(props: any) {
 function Wire() {
   const { scene } = useGLTF("/models/wires.glb")
   const ref = useRef<THREE.Group>(null!)
+  const targetRotation = useRef(0)
   const progress = useRef(0)
 
   useLayoutEffect(() => {
@@ -558,6 +576,18 @@ function Wire() {
     ref.current.position.y = -4.7 + eased * 3
     ref.current.rotation.y = eased * Math.PI * 1.45
   })
+
+  useEffect(() => {
+    const onScroll = () => {
+      const scroll = window.scrollY / window.innerHeight
+
+      // 🔥 control strength here
+      targetRotation.current = scroll * Math.PI * 0.5
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
 
   return (
     <primitive ref={ref} object={scene} scale={0.5} position={[0.03, -3, 0.08]} />

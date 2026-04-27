@@ -25,8 +25,8 @@ const ROCK = {
 }
 
 const MAP = {
-    pos: [-2, 0.3, -1] as const,
-    scale: 0.7,
+    pos: [-2, 0.3, -2] as const,
+    scale: 0.70,
     rot: [0, 0.4, 0] as const,
 }
 

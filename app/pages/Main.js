@@ -25,7 +25,7 @@ function ScrollController({ children }) {
     const scroll = window.scrollY / window.innerHeight
 
     if (group.current) {
-      group.current.rotation.y = scroll * Math.PI * 0.5
+      group.current.rotation.y = scroll * Math.PI * 0.6
     }
   })
 
@@ -137,6 +137,7 @@ export default function Main() {
     window.addEventListener('resize', checkDevice)
 
     return () => window.removeEventListener('resize', checkDevice)
+
   }, [])
 
   // Disable expensive features on mobile
@@ -148,7 +149,9 @@ export default function Main() {
       antialias: !isLowEnd,
       depth: true,
       stencil: false,
-      preserveDrawingBuffer: false
+      preserveDrawingBuffer: false,
+      toneMapping: THREE.ACESFilmicToneMapping,
+      toneMappingExposure: 0.35,
     },
     shadows: !isMobile, // Disable shadows on mobile
     style: { background: "transparent" },
@@ -178,11 +181,11 @@ export default function Main() {
           pointerEvents: "none", // don't block clicks
         }}
       />
-      <div className="projector-layer">
+      {/* <div className="projector-layer">
         <video autoPlay loop muted playsInline>
           <source src="/video/video1.webm" type="video/webm" />
         </video>
-      </div>
+      </div> */}
       <div
         style={{
           position: "fixed",
@@ -234,7 +237,6 @@ export default function Main() {
       <Scene2 />
       <div style={{ height: isMobile ? "100vh" : "120vh" }} />
 
-      {/* Scene4 — sticky scroll section, covers fixed canvas */}
 
       <div style={{ position: "relative", zIndex: 20 }}>
         <Scene4 />

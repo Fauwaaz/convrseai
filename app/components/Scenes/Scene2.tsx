@@ -4,10 +4,29 @@ import { motion } from "framer-motion"
 import { Environment, OrbitControls } from "@react-three/drei"
 import { Canvas, useFrame } from "@react-three/fiber"
 import { useGLTF } from "@react-three/drei"
-import { useLayoutEffect, useRef } from "react"
+import { useEffect, useLayoutEffect, useRef } from "react"
 import * as THREE from "three"
 import { Bloom, EffectComposer } from "@react-three/postprocessing"
 import Image from "next/image"
+
+let _scroll = 0
+let _target = 0
+
+if (typeof window !== "undefined") {
+  window.addEventListener(
+    "scroll",
+    () => {
+      _target = window.scrollY / window.innerHeight
+    },
+    { passive: true }
+  )
+}
+
+
+export function getSmoothScroll() {
+  _scroll += (_target - _scroll) * 0.08 // 🔥 easing strength
+  return _scroll
+}
 
 // ✅ Fix 3: type children properly
 function ScrollController({ children }: { children: React.ReactNode }) {
@@ -28,10 +47,11 @@ function LogoMesh() {
   const group = useRef<THREE.Group>(null!)
 
   useLayoutEffect(() => {
-    // ─── Apply LOGO_MAT to every mesh ────────────────────────────────────────
     scene.traverse((child) => {
       if (!(child as THREE.Mesh).isMesh) return
+
       const mesh = child as THREE.Mesh
+
       mesh.material = new THREE.MeshPhysicalMaterial({
         color: new THREE.Color("#ffffff"),
         metalness: 1.0,
@@ -55,23 +75,49 @@ function LogoMesh() {
       mesh.receiveShadow = false
     })
 
+    // ✅ CENTER PIVOT
     const box = new THREE.Box3().setFromObject(scene)
+    const center = box.getCenter(new THREE.Vector3())
+    scene.position.sub(center)
+
+    // ✅ AUTO SCALE (same as your working version)
     const size = box.getSize(new THREE.Vector3()).length()
     scene.scale.setScalar(2.4 / size)
 
-    box.setFromObject(scene)
-    const center = box.getCenter(new THREE.Vector3())
-    scene.position.sub(center)
   }, [scene])
 
-  useFrame(() => {
-    if (!group.current) return
-    group.current.rotation.y = THREE.MathUtils.lerp(
-      group.current.rotation.y,
-      0,   // targetRotation.current — restore if you need scroll rotation
-      0.08
-    )
-  })
+  // useFrame(() => {
+  //   if (!group.current) return
+
+  //   const scroll = getSmoothScroll()
+
+  //   // 🔥 define when animation should happen
+  //   const start = 0.6   // when section enters
+  //   const end = 2.2     // when section exits
+
+  //   // normalize 0 → 1 ONLY inside this range
+  //   const raw = (scroll - start) / (end - start)
+
+  //   const progress = THREE.MathUtils.clamp(raw, 0, 1)
+
+  //   // optional easing (makes it feel premium)
+  //   const eased = THREE.MathUtils.smoothstep(progress, 0, 1)
+
+  //   // 🔥 Y movement ONLY in this range
+  //   const baseY = 0
+  //   const moveY = 6
+
+  //   const targetY = baseY + (1 - eased) * moveY
+
+  //   group.current.rotation.x = 0
+  //   group.current.rotation.z = 0
+
+  //   group.current.position.y = THREE.MathUtils.lerp(
+  //     group.current.position.y,
+  //     targetY,
+  //     0.15
+  //   )
+  // })
 
   return (
     <group ref={group}>
@@ -80,22 +126,25 @@ function LogoMesh() {
   )
 }
 
+
 export default function Scene2() {
   return (
     <section
-      className="scene2-root relative"
+      className="scene2-root relative overflow-hidden"
       style={{ fontFamily: "var(--font-crystal), sans-serif" }}
     >
 
-      {/* <div className="absolute top-0 w-full">
+      {/* <div className="absolute top-46 w-full">
         <Image
-          src="/textures/line.png"
+          src="/textures/glass-edge-3.svg"
           alt="Line 1"
-          width={2560}
+          width={1920}
           height={1080}
-          className="line1 absolute top-45 left-0 w-full h-auto transform -rotate-5"
+          className="line1 absolute top-0 left-0 w-full h-auto transform -rotate-5"
         />
       </div> */}
+
+      {/* <div className="distortion-layer" /> */}
 
       <div className="scene2-panel">
         <motion.div className="scene2-inner">

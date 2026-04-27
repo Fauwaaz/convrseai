@@ -348,11 +348,11 @@ function VolumeFog() {
 
 // ─── Fix logo config — bring into camera view ─────────────────────────────────
 const LOGO_CFG = {
-  pos:       [0.2, 0, -4] as const,   // ← was [0,10,0] — way above camera
-  scale:     1,
-  rot:       [0, 0, 0] as const,
+  pos: [0.2, 0, -4] as const,   // ← was [0,10,0] — way above camera
+  scale: 1,
+  rot: [0, 0, 0] as const,
   spinSpeed: 0.8,                  // ← was 0.8 — too fast
-  floatAmp:  0.06,
+  floatAmp: 0.06,
 }
 
 // ─── Materials ────────────────────────────────────────────────────────────────
@@ -402,8 +402,76 @@ function Logo() {
   )
 }
 
+const SPARK_CFG = {
+  pos: [0.1, -0.5, 0] as [number, number, number],
+  rot: [1.2, 0, 0] as [number, number, number],
+  scale: 0.08,
+
+  floatAmp: 0.2,
+  floatSpeed: 0.5,
+
+  rotSpeed: 0.002,
+}
+
+function SparkCloudLogo() {
+  const { scene } = useGLTF("/models/assets/sparkcloud-logo.glb")
+  const ref = useRef<THREE.Group>(null!)
+
+  useLayoutEffect(() => {
+    const glassMat = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color("#ffffff"),
+      metalness: 0,
+      roughness: 0.8,
+      transmission: 1.0,
+      thickness: 2.5,
+      ior: 1.6,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.05,
+      envMapIntensity: 2.5,
+      reflectivity: 1.0,
+      transparent: true,
+    })
+
+    scene.traverse((child: any) => {
+      if (!child.isMesh) return
+      child.material = glassMat
+      child.castShadow = false
+      child.receiveShadow = false
+    })
+
+    // center pivot
+    const box = new THREE.Box3().setFromObject(scene)
+    const center = box.getCenter(new THREE.Vector3())
+    scene.position.sub(center)
+  }, [scene])
+
+  // useFrame(({ clock }) => {
+  //   if (!ref.current) return
+
+  //   const t = clock.getElapsedTime()
+
+  //   // 🔥 float
+  //   ref.current.position.y =
+  //     SPARK_CFG.pos[1] +
+  //     Math.sin(t * SPARK_CFG.floatSpeed) * SPARK_CFG.floatAmp
+
+  //   // 🔥 rotation
+  //   ref.current.rotation.y += SPARK_CFG.rotSpeed
+  // })
+
+  return (
+    <group
+      ref={ref}
+      position={SPARK_CFG.pos}
+      rotation={SPARK_CFG.rot}
+      scale={SPARK_CFG.scale}
+    >
+      <primitive object={scene} />
+    </group>
+  )
+}
 // ─── Model ────────────────────────────────────────────────────────────────────
-function  Scene6Model() {
+function Scene6Model() {
   const { scene } = useGLTF("/models/assets/scene4-all-copy.glb")
   const groupRef = useRef<THREE.Group>(null!)
 
@@ -495,7 +563,7 @@ export default function Scene6() {
           powerPreference: "high-performance",
           // ─── Exposure control ─────────────────────────────────────────
           toneMapping: THREE.ACESFilmicToneMapping,  // cinematic — doesn't blow out
-          toneMappingExposure: 0.005,
+          toneMappingExposure: 0.010,
         }}
         shadows
         style={{ background: "transparent" }}
@@ -513,7 +581,10 @@ export default function Scene6() {
         <Scene6Model />
         <VolumeFog />
 
-        <Logo />    
+        {/* <SparkCloudLogo /> */}
+
+        <Logo />
+
 
 
         {/* <EffectComposer>

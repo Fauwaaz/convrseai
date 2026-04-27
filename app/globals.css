@@ -57,7 +57,7 @@ body {
 .projector-layer {
   position: fixed;
   inset: 0;
-  z-index: 10;
+  z-index: 99;
   pointer-events: none;
 
   display: flex;
@@ -124,7 +124,7 @@ canvas {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: #ffffff;
+  background: #000;
   background: linear-gradient(175deg, rgba(255, 255, 255, 0) 20%, rgba(20, 20, 20, 1) 20%, rgba(0, 0, 0, 1) 80%, rgba(255, 255, 255, 0) 80%);
 }
 
@@ -135,7 +135,6 @@ canvas {
   inset: 0;
   pointer-events: none;
 }
-
 
 .scene2-panel {
   width: 100%;
@@ -169,20 +168,72 @@ canvas {
 }
 
 .scene2-title {
-
+  position: relative;
   font-family: var(--font-crystal), sans-serif;
-
   font-size: clamp(80px, 9vw, 105px);
   line-height: 0.9;
-
   color: #fff;
 
   text-shadow:
     0 0 10px rgba(255, 255, 255, 0.4),
     0 0 25px rgba(255, 255, 255, 0.25);
+
   margin-bottom: 120px;
   z-index: 3;
   pointer-events: none;
+}
+
+.scene2-title::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+
+  background: radial-gradient(
+      circle at left center,
+      rgba(255,255,255,0.25) 0%,
+      rgba(255,255,255,0.12) 20%,
+      rgba(255,255,255,0.05) 40%,
+      transparent 70%
+    );
+
+  filter: blur(60px);
+
+  transform: scaleX(2.5) rotate(-10deg);
+
+  opacity: 0.2;
+
+  z-index: -1;
+  pointer-events: none;
+}
+
+.scene2-title::after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255,255,255,0.25) 35%,
+    rgba(255,255,255,0.15) 45%,
+    transparent 60%
+  );
+
+  filter: blur(80px);
+
+  transform: scaleX(3) rotate(-8deg);
+
+  opacity: 0.2;
+
+  z-index: -1;
+  pointer-events: none;
+  animation: raysMove 10s linear infinite;
+}
+
+@keyframes raysMove {
+  0% { transform: translateX(-10%) scaleX(3) rotate(-8deg); }
+  50% { transform: translateX(10%) scaleX(3) rotate(-8deg); }
+  100% { transform: translateX(-10%) scaleX(3) rotate(-8deg); }
 }
 
 .scene2-text {
@@ -197,4 +248,54 @@ canvas {
   z-index: 3;
   pointer-events: none;
 
+}
+
+.distortion-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+
+  filter: contrast(1.2) saturate(1.1);
+
+  background:
+    linear-gradient(to bottom,
+      rgba(0,0,0,0.6) 0%,
+      rgba(0,0,0,0) 20%,
+      rgba(0,0,0,0) 80%,
+      rgba(0,0,0,0.6) 0%
+    );
+
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+
+  mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    transparent 25%,
+    transparent 75%,
+    black 100%
+  );
+
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    transparent 25%,
+    transparent 75%,
+    black 100%
+  );
+}
+
+
+.distortion-layer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background: url("/textures/distortion.png");
+  background-size: cover;
+  opacity: 0.15;
+  mix-blend-mode: screen;
+
+  animation: distortMove 6s linear infinite;
 }
