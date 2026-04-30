@@ -221,11 +221,32 @@ function Nature() {
     if (backGrassRef.current) setY(backGrassRef.current, s * 3)
     if (frontGrassRef.current) setY(frontGrassRef.current, s * 3)
 
-    const rotTarget = s * Math.PI
-    if (backTreeRef.current) lerpRotY(backTreeRef.current, Math.PI * 0.3 + rotTarget)
-    if (frontTreeRef.current) lerpRotY(frontTreeRef.current, Math.PI * -0.1 + rotTarget)
-    if (backGrassRef.current) lerpRotY(backGrassRef.current, Math.PI * 0.1 + rotTarget)
-    if (frontGrassRef.current) lerpRotY(frontGrassRef.current, Math.PI * -0.1 + rotTarget)
+    // 🔥 normalize scroll range (important)
+    const start = 0.2
+    const end = 2.2
+
+    const raw = THREE.MathUtils.clamp((s - start) / (end - start), 0, 1)
+
+    // 🔥 ease curve (organic feel)
+    const eased = 1 - Math.pow(1 - raw, 3)
+
+    // 🔥 subtle breathing motion
+    const t = performance.now() * 0.001
+    const drift = Math.sin(t * 0.6) * 0.08
+
+    // 🔥 final rotation target
+    const rotTarget = eased * Math.PI * 0.8 + drift
+    if (backTreeRef.current)
+      lerpRotY(backTreeRef.current, Math.PI * 0.3 + rotTarget, 0.05)
+
+    if (frontTreeRef.current)
+      lerpRotY(frontTreeRef.current, Math.PI * -0.1 + rotTarget * 1.1, 0.06)
+
+    if (backGrassRef.current)
+      lerpRotY(backGrassRef.current, Math.PI * 0.1 + rotTarget * 0.7, 0.04)
+
+    if (frontGrassRef.current)
+      lerpRotY(frontGrassRef.current, Math.PI * -0.1 + rotTarget * 0.6, 0.04)
   })
 
   return (
@@ -506,6 +527,10 @@ function Model(props: any) {
 
   useFrame((_, delta) => {
     if (!group.current) return
+
+    // lerp the global scroll value smoothly
+    _lerpedScroll += (_rawScroll - _lerpedScroll) * 0.05
+
     if (!introDone.current) {
       introProgress.current += delta * 0.4
       const t = Math.min(introProgress.current, 1)
@@ -515,24 +540,16 @@ function Model(props: any) {
       if (t >= 1) introDone.current = true
       return
     }
+
+    // ← smooth eased scroll rotation
+    // const targetRot = _lerpedScroll * Math.PI * 0.5
     // group.current.rotation.y = THREE.MathUtils.lerp(
     //   group.current.rotation.y,
-    //   targetRotation.current,
-    //   0.08 // 🔥 easing strength
+    //   targetRot,
+    //   0.06
     // )
   })
 
-  useEffect(() => {
-    const onScroll = () => {
-      const scroll = window.scrollY / window.innerHeight
-
-      // 🔥 control strength here
-      targetRotation.current = scroll * Math.PI * 0.5
-    }
-
-    window.addEventListener("scroll", onScroll, { passive: true })
-    return () => window.removeEventListener("scroll", onScroll)
-  }, [])
 
   return (
     <group ref={group} {...props}>
@@ -571,23 +588,24 @@ function Wire() {
 
   useFrame((_, delta) => {
     if (!ref.current) return
+
+    // lerp scroll
+    _lerpedScroll += (_rawScroll - _lerpedScroll) * 0.05
+
+    // intro animation
     progress.current += delta * 0.4
     const eased = THREE.MathUtils.smoothstep(Math.min(progress.current, 1), 0, 1)
     ref.current.position.y = -4.7 + eased * 3
     ref.current.rotation.y = eased * Math.PI * 1.45
+
+    // ← add smooth scroll rotation on top of intro
+    const targetRot = eased * Math.PI * 1.45 + _lerpedScroll * Math.PI * 0.5
+    ref.current.rotation.y = THREE.MathUtils.lerp(
+      ref.current.rotation.y,
+      targetRot,
+      0.06
+    )
   })
-
-  useEffect(() => {
-    const onScroll = () => {
-      const scroll = window.scrollY / window.innerHeight
-
-      // 🔥 control strength here
-      targetRotation.current = scroll * Math.PI * 0.5
-    }
-
-    window.addEventListener("scroll", onScroll, { passive: true })
-    return () => window.removeEventListener("scroll", onScroll)
-  }, [])
 
   return (
     <primitive ref={ref} object={scene} scale={0.5} position={[0.03, -3, 0.08]} />

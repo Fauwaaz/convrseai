@@ -22,26 +22,36 @@ if (typeof window !== "undefined") {
   )
 }
 
+// ── shared easing state ──
+let _rawScroll2 = 0
+let _lerpedScroll2 = 0
+
+if (typeof window !== "undefined") {
+  window.addEventListener("scroll", () => {
+    _rawScroll2 = window.scrollY / window.innerHeight
+  }, { passive: true })
+}
+
 
 export function getSmoothScroll() {
   _scroll += (_target - _scroll) * 0.08 // 🔥 easing strength
   return _scroll
 }
 
-// ✅ Fix 3: type children properly
 function ScrollController({ children }: { children: React.ReactNode }) {
   const group = useRef<THREE.Group>(null!)
 
   useFrame(() => {
-    const scroll = window.scrollY / window.innerHeight
+    // ── same easing speed as the other controller ──
+    _lerpedScroll2 += (_rawScroll2 - _lerpedScroll2) * 0.06
+
     if (group.current) {
-      group.current.rotation.y = scroll * Math.PI * 0.5
+      group.current.rotation.y = _lerpedScroll2 * Math.PI * -0.6
     }
   })
 
   return <group ref={group}>{children}</group>
 }
-
 function LogoMesh() {
   const { scene } = useGLTF("/models/logo/logo.glb")
   const group = useRef<THREE.Group>(null!)
@@ -86,38 +96,38 @@ function LogoMesh() {
 
   }, [scene])
 
-  // useFrame(() => {
-  //   if (!group.current) return
+  useFrame(() => {
+    if (!group.current) return
 
-  //   const scroll = getSmoothScroll()
+    const scroll = getSmoothScroll()
 
-  //   // 🔥 define when animation should happen
-  //   const start = 0.6   // when section enters
-  //   const end = 2.2     // when section exits
+    // 🔥 define when animation should happen
+    const start = 0.6   // when section enters
+    const end = 2.2     // when section exits
 
-  //   // normalize 0 → 1 ONLY inside this range
-  //   const raw = (scroll - start) / (end - start)
+    // normalize 0 → 1 ONLY inside this range
+    const raw = (scroll - start) / (end - start)
 
-  //   const progress = THREE.MathUtils.clamp(raw, 0, 1)
+    const progress = THREE.MathUtils.clamp(raw, 0, 1)
 
-  //   // optional easing (makes it feel premium)
-  //   const eased = THREE.MathUtils.smoothstep(progress, 0, 1)
+    // optional easing (makes it feel premium)
+    const eased = THREE.MathUtils.smoothstep(progress, 0, 1)
 
-  //   // 🔥 Y movement ONLY in this range
-  //   const baseY = 0
-  //   const moveY = 6
+    // 🔥 Y movement ONLY in this range
+    const baseY = 0
+    const moveY = 6
 
-  //   const targetY = baseY + (1 - eased) * moveY
+    const targetY = baseY + (1 - eased) * moveY
 
-  //   group.current.rotation.x = 0
-  //   group.current.rotation.z = 0
+    group.current.rotation.x = 0
+    group.current.rotation.z = 0
 
-  //   group.current.position.y = THREE.MathUtils.lerp(
-  //     group.current.position.y,
-  //     targetY,
-  //     0.15
-  //   )
-  // })
+    group.current.position.y = THREE.MathUtils.lerp(
+      group.current.position.y,
+      targetY,
+      0.15
+    )
+  })
 
   return (
     <group ref={group}>

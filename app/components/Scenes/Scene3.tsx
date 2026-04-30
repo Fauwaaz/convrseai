@@ -7,6 +7,7 @@ import * as THREE from "three"
 import { Text } from "@react-three/drei"
 import { shaderMaterial } from "@react-three/drei"
 import { extend } from "@react-three/fiber"
+import { s } from "framer-motion/client"
 
 
 const RoundedVideoMaterial = shaderMaterial(
@@ -105,16 +106,19 @@ function applyPlateMaterial(obj: THREE.Object3D) {
     if (!child.isMesh) return
     child.material = new THREE.MeshPhysicalMaterial({
       color: new THREE.Color("#0a4a6a"),
+      transmission: 0.92,      // ← glass see-through
       thickness: 1.0,
       ior: 1.4,
-      opacity: 0.5,
-      roughness: 0.15,       // too high = foggy mess
+      roughness: 0.08,         // ← lower = more distortion/refraction
       metalness: 0.0,
       clearcoat: 1.0,
       clearcoatRoughness: 0.05,
       envMapIntensity: 4,
       transparent: true,
+      opacity: 0.6,
+      depthWrite: false,
     })
+    child.renderOrder = 2
   })
 }
 
@@ -223,20 +227,28 @@ function Flowers() {
 // ─── Plates ───────────────────────────────────────────────────────────────────
 const PLATE_DATA = [
   {
-    pos: [-0.5, -22, -0.2] as [number, number, number],
+    pos: [-0.5, -23.3, -0.5] as [number, number, number],
     rot: [0, -3.2, 0] as [number, number, number],
     tint: "#0a4a6a",
-    scale: 0.8,
+    scale: 1,
     label: "WALKTHROUGHS",
     video: "/video/walkthroughs.webm",
   },
   {
-    pos: [0.5, -23, -0.5] as [number, number, number],
-    rot: [0, -4.6, 0.01] as [number, number, number],
+    pos: [-0.3, -24.8, -0.1] as [number, number, number],
+    rot: [0, 4, 0] as [number, number, number],
     tint: "#0a4a6a",
-    scale: 0.8,
-    label: "EXPERIENCES",
+    scale: 1,
+    label: "SCALE MODELS",
     video: "/video/scale-models.webm",
+  },
+  {
+    pos: [0, -26, 0] as [number, number, number],
+    rot: [0, 4.9, 0] as [number, number, number],
+    tint: "#0a4a6a",
+    scale: 1,
+    label: "INTERACTIVE SCREENS",
+    video: "/video/interactive-screens.webm",
   },
 ]
 
@@ -284,6 +296,7 @@ function useVideoTexture(src: string) {
 
 function PlateWithVideo({ config }: { config: PlateWithObject }) {
   const texture = useVideoTexture(config.video)
+  const textRef = useRef<THREE.Mesh>(null!)
 
   const material = useMemo(() => {
     const mat = new RoundedVideoMaterial()
@@ -300,6 +313,20 @@ function PlateWithVideo({ config }: { config: PlateWithObject }) {
     return () => material.dispose()
   }, [material])
 
+  useFrame(({ clock }) => {
+    if (!textRef.current) return
+
+    const t = clock.getElapsedTime()
+
+    // 🔥 vertical float
+    textRef.current.position.y =
+      6.4 + Math.sin(t * 1.2) * 0.005
+
+    // 🔥 subtle rotation drift
+    textRef.current.rotation.y =
+      Math.PI - 0.05 + Math.sin(t * 0.6) * 0.02
+  })
+
   return (
     <group position={config.pos} rotation={config.rot} scale={config.scale}>
       {/* plate mesh */}
@@ -312,11 +339,14 @@ function PlateWithVideo({ config }: { config: PlateWithObject }) {
 
       {/* label — sits just below the plate bottom edge (-0.63 units) */}
       <Text
+        ref={textRef}
         position={[-0.45, 6.4, -2.2]}
         rotation={[0, Math.PI - 0.05, 0]}
         fontSize={0.12}
         font="/fonts/CrystalBold.ttf"
-        color="#fff"
+        color="#ffffff"
+        material-toneMapped={false}
+
         anchorX="center"
         anchorY="top"
         letterSpacing={0.14}

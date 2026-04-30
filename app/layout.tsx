@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import localFont from "next/font/local";
+import { LenisProvider } from "../utils/lenisScroll"
 
 const crystal = localFont({
   src: [
@@ -34,7 +35,9 @@ export default function RootLayout({
       <body
         className={`${crystal.variable} antialiased`}
       >
-        {children}
+        <LenisProvider>
+          {children}
+        </LenisProvider>
       </body>
     </html>
   );

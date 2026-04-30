@@ -20,12 +20,19 @@ import Scene7 from "../components/Scenes/Scene7";
 
 function ScrollController({ children }) {
   const group = useRef()
+  const currentRot = useRef(0)
 
   useFrame(() => {
     const scroll = window.scrollY / window.innerHeight
 
+    // ── adjust multiplier for rotation amount ──
+    const targetRot = scroll * Math.PI * -0.6
+
+    // ── adjust 0.06 for easing speed (lower = slower/smoother) ──
+    currentRot.current += (targetRot - currentRot.current) * 0.06
+
     if (group.current) {
-      group.current.rotation.y = scroll * Math.PI * 0.6
+      group.current.rotation.y = currentRot.current
     }
   })
 
@@ -123,21 +130,16 @@ export default function Main() {
   const [isMobile, setIsMobile] = useState(false)
   const [isLowEnd, setIsLowEnd] = useState(false)
 
-  // Detect mobile and low-end devices
   useEffect(() => {
     const checkDevice = () => {
       const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
       const lowEnd = mobile && (window.innerWidth < 768 || /Android [1-4]|iPhone OS [1-8]/.test(navigator.userAgent))
-
       setIsMobile(mobile)
       setIsLowEnd(lowEnd)
     }
-
     checkDevice()
     window.addEventListener('resize', checkDevice)
-
     return () => window.removeEventListener('resize', checkDevice)
-
   }, [])
 
   // Disable expensive features on mobile
@@ -181,25 +183,24 @@ export default function Main() {
           pointerEvents: "none", // don't block clicks
         }}
       />
-      {/* <div className="projector-layer">
+      <div className="projector-layer">
         <video autoPlay loop muted playsInline>
           <source src="/video/video1.webm" type="video/webm" />
         </video>
-      </div> */}
+      </div>
       <div
         style={{
           position: "fixed",
           inset: 0,
           zIndex: 15,
-          pointerEvents: "auto"
+          pointerEvents: "none"
         }}
         className="glow-bg"
       >
         <Canvas {...canvasProps}>
           <ambientLight intensity={isMobile ? 3 : 5} color="#000000" />
 
-          {/* Reduce light count on mobile */}
-          {!isLowEnd && <SceneLights />}
+          <SceneLights />
 
           {/* Fog — pure black, close start so edges fall off fast */}
           <fog attach="fog" args={["#000000", 5, 22]} />
