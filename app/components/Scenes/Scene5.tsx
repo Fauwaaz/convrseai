@@ -17,8 +17,8 @@ export default function Scene5() {
   const [active, setActive] = useState<number | null>(2) // center default
 
   return (
-    <section className="relative h-screen bg-black flex items-center justify-center overflow-hidden">
-      <div className="absolute inset-0 -top-80 -z-10 opacity-10">
+    <section className="relative h-screen flex items-center justify-center overflow-hidden">
+      <div className="absolute inset-0 -top-90 -z-10 opacity-5">
         <Lottie
           animationData={animationData}
           loop
@@ -51,7 +51,7 @@ export default function Scene5() {
                 opacity: active !== null && !isActive ? 1 : 1,
               }}
             >
-              <div className="w-[300px] h-[600px] rounded-4xl overflow-hidden shadow-2xl">
+              <div className="w-75 h-150 rounded-4xl overflow-hidden shadow-2xl">
                 <Image
                   alt="Image"
                   src={src}
@@ -67,7 +67,6 @@ export default function Scene5() {
         })}
 
       </div>
-
     </section>
   )
 }

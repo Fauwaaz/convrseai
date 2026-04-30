@@ -4,7 +4,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, OrbitControls, useVideoTexture } from "@react-three/drei";
 import Model from "../components/Model";
 import Wire from "../components/Wire";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, Suspense } from "react";
 import * as THREE from "three";
 
 import Scene1 from "../components/Scenes/Scene1";
@@ -17,6 +17,7 @@ import Meteors from "../components/Scenes/assets/Meteors";
 import Scene4 from "../components/Scenes/Scene4";
 import Scene5 from "../components/Scenes/Scene5";
 import Scene7 from "../components/Scenes/Scene7";
+import Loader from "../components/Loader";
 
 function ScrollController({ children }) {
   const group = useRef()
@@ -198,40 +199,44 @@ export default function Main() {
         className="glow-bg"
       >
         <Canvas {...canvasProps}>
-          <ambientLight intensity={isMobile ? 3 : 5} color="#000000" />
+          <Suspense fallback={null}>
+            <ambientLight intensity={isMobile ? 3 : 5} color="#000000" />
 
-          <SceneLights />
+            <SceneLights />
 
-          {/* Fog — pure black, close start so edges fall off fast */}
-          <fog attach="fog" args={["#000000", 5, 22]} />
+            {/* Fog — pure black, close start so edges fall off fast */}
+            <fog attach="fog" args={["#000000", 5, 22]} />
 
-          <Environment preset="night" background={false} />
+            <Environment preset="night" background={false} />
 
-          <EffectComposer>
-            {!isMobile && <Bloom
-              intensity={0.5}
-              kernelSize={3}
-            />}
-          </EffectComposer>
+            <EffectComposer>
+              {!isMobile && <Bloom
+                intensity={0.5}
+                kernelSize={3}
+              />}
+            </EffectComposer>
 
-          <Meteors />
+            <Meteors />
 
-          <ScrollController>
-            <Scene1 />
-            <Scene3 />
-          </ScrollController>
+            <ScrollController>
+              <Scene1 />
+              <Scene3 />
+            </ScrollController>
 
-          <OrbitControls
-            enableZoom={false} // Disable zoom on mobile for better performance
-            enablePan={false}
-            enableTouchRotate={isMobile} // Enable touch rotate on mobile
-            touchRotate={isMobile}
-            minPolarAngle={Math.PI / 2}
-            maxPolarAngle={Math.PI / 2}
-            makeDefault
-          />
+            <OrbitControls
+              enableZoom={false} // Disable zoom on mobile for better performance
+              enablePan={false}
+              enableTouchRotate={isMobile} // Enable touch rotate on mobile
+              touchRotate={isMobile}
+              minPolarAngle={Math.PI / 2}
+              maxPolarAngle={Math.PI / 2}
+              makeDefault
+            />
+          </Suspense>
         </Canvas>
       </div>
+
+      <Loader />
 
       {/* Reduced height for mobile */}
       <div style={{ height: isMobile ? "100vh" : "200vh" }} />

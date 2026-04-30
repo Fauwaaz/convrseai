@@ -586,7 +586,6 @@ export default function Scene6() {
         <Logo />
 
 
-
         {/* <EffectComposer>
           <Bloom
             intensity={0.001}

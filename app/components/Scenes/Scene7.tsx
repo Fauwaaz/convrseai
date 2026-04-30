@@ -4,7 +4,7 @@ import { Canvas, useFrame } from "@react-three/fiber"
 import { useGLTF } from "@react-three/drei"
 import { useRef, useLayoutEffect } from "react"
 import * as THREE from "three"
-import { Bloom, EffectComposer } from "@react-three/postprocessing"
+import { Bloom, DepthOfField, EffectComposer } from "@react-three/postprocessing"
 
 /* ───────────────── CONFIG (TUNE EVERYTHING HERE) ───────────────── */
 
@@ -262,7 +262,92 @@ function SceneLights() {
     )
 }
 
+function CausticsLayer() {
+    const ref = useRef<THREE.Mesh>(null!)
+    const matRef = useRef<THREE.ShaderMaterial>(null!)
+
+    useFrame(({ clock }) => {
+        if (!matRef.current) return
+        matRef.current.uniforms.uTime.value = clock.getElapsedTime()
+    })
+
+    return (
+        <mesh ref={ref} position={[0, 2.5, -1]} rotation={[4.8, Math.PI, 0]}>
+            <planeGeometry args={[22, 5, 32, 32]} />
+            <shaderMaterial
+                ref={matRef}
+                uniforms={{
+                    uTime: { value: 0 },
+                }}
+                vertexShader={`
+          uniform float uTime;
+          varying vec2 vUv;
+          varying float vWave;
+
+          void main() {
+            vUv = uv;
+
+            vec3 pos = position;
+
+            // multi-layered wave displacement
+            float wave1 = sin(pos.x * 2.5 + uTime * 0.8) * 0.08;
+            float wave2 = sin(pos.y * 3.0 + uTime * 1.1) * 0.06;
+            float wave3 = sin((pos.x + pos.y) * 2.0 + uTime * 0.6) * 0.05;
+
+            pos.z += wave1 + wave2 + wave3;
+            vWave = wave1 + wave2 + wave3;
+
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+          }
+        `}
+                fragmentShader={`
+          uniform float uTime;
+          varying vec2 vUv;
+          varying float vWave;
+
+          void main() {
+            vec2 uv = vUv;
+
+            // caustic pattern — layered sine grids
+            float c1 = sin(uv.x * 18.0 + uTime * 0.5) * sin(uv.y * 14.0 + uTime * 0.4);
+            float c2 = sin(uv.x * 12.0 - uTime * 0.3) * sin(uv.y * 20.0 + uTime * 0.6);
+            float c3 = sin((uv.x + uv.y) * 16.0 + uTime * 0.7);
+
+            float caustic = (c1 + c2 + c3) * 0.33;
+            caustic = pow(max(caustic, 0.0), 1.8);  // sharpen bright spots
+
+            // diamond/net pattern
+            float net = abs(sin(uv.x * 10.0 + uTime * 0.2)) * abs(sin(uv.y * 8.0 + uTime * 0.15));
+            net = pow(net, 3.0) * 0.6;
+
+            float combined = caustic * 0.7 + net * 0.5 + vWave * 1.2;
+
+            // colour: dark teal → bright white-blue
+            vec3 deep   = vec3(0.02, 0.08, 0.14);
+            vec3 bright = vec3(0.65, 0.88, 1.00);
+            vec3 col = mix(deep, bright, combined);
+
+            // fade to black at bottom edge — creates the transition
+            float fadeBottom = smoothstep(0.0, 0.45, vUv.y);
+            // fade to black at top edge
+            float fadeTop    = smoothstep(1.0, 0.75, vUv.y);
+
+            float alpha = combined * fadeBottom * fadeTop * 0.82;
+
+            gl_FragColor = vec4(col, alpha);
+          }
+        `}
+                transparent={true}
+                depthWrite={false}
+                blending={THREE.AdditiveBlending}
+                side={THREE.DoubleSide}
+            />
+        </mesh>
+    )
+}
+
 /* ───────────────── EXPORT ───────────────── */
+
 
 export default function Scene7() {
     return (
@@ -282,12 +367,22 @@ export default function Scene7() {
 
                 <SceneLights />
 
+                <CausticsLayer />
+
                 <EffectComposer>
                     <Bloom
                         intensity={0.3}
                         kernelSize={3}
                     />
                 </EffectComposer>
+
+                {/* <OrbitControls
+                    enableZoom={true} // Disable zoom on mobile for better performance
+                    enablePan={false}
+                    minPolarAngle={Math.PI / 10}
+                    maxPolarAngle={Math.PI / 0}
+                    makeDefault
+                /> */}
 
                 <Land />
                 <Rock />
