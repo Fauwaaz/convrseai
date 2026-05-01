@@ -99,13 +99,52 @@ export default function Loader() {
             ctx.restore()
 
             // main ring
-            ctx.save(); ctx.shadowColor = "rgba(60,200,255,0.7)"; ctx.shadowBlur = 18
-            ctx.strokeStyle = `rgba(50,190,255,${0.75 + Math.sin(t * 1.1) * 0.25})`
-            ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(cx, cy, 130, 0, Math.PI * 2); ctx.stroke()
-            const sx = cx + Math.cos(t * 0.5) * 130, sy = cy + Math.sin(t * 0.5) * 130
-            const sg = ctx.createRadialGradient(sx, sy, 0, sx, sy, 14)
-            sg.addColorStop(0, "rgba(150,230,255,0.9)"); sg.addColorStop(1, "rgba(50,150,255,0)")
-            ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(sx, sy, 14, 0, Math.PI * 2); ctx.fill()
+            ctx.save()
+            ctx.beginPath()
+            ctx.arc(cx, cy, 110, 0, Math.PI * 2)
+            ctx.clip()
+
+            ctx.font = "9px monospace"
+            ctx.textAlign = "center"
+
+            for (let r = 0; r < 10; r++) {
+                for (let c = 0; c < 14; c++) {
+                    const x = cx - 65 + c * 10
+                    const y = cy - 45 + r * 10
+
+                    // 🔥 radial falloff (circle shape inside grid)
+                    const dx = (x - cx) / 90
+                    const dy = (y - cy) / 90
+                    const dist = Math.sqrt(dx * dx + dy * dy)
+
+                    if (dist > 1) continue
+
+                    // 🔥 center emphasis (this is key)
+                    const centerBoost = 1 - dist
+
+                    // 🔥 structured flicker (NOT pure random)
+                    const noise = Math.sin(r * 1.5 + c * 2 + t * 3)
+
+                    const alpha =
+                        0.1 +
+                        centerBoost * 0.6 +
+                        (noise * 0.5 + 0.5) * 0.2
+
+                    // 🔥 color layering
+                    const isCore = dist < 0.25
+
+                    ctx.fillStyle = isCore
+                        ? `rgba(180,240,255,${0.7 + centerBoost * 0.3})`
+                        : `rgba(80,180,220,${alpha})`
+
+                    // 🔥 controlled character set (less chaos)
+                    const char =
+                        glitchChars[(r * c + Math.floor(t * 10)) % glitchChars.length]
+
+                    ctx.fillText(char, x, y)
+                }
+            }
+
             ctx.restore()
 
             // orbit dot
@@ -129,18 +168,18 @@ export default function Loader() {
     if (progress >= 100) return null  // unmount when loaded
 
     return (
-        <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "#000", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "#000", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }} className="font-crystal-regular">
             <canvas ref={canvasRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
-            <div style={{ position: "relative", zIndex: 2, display: "flex", flexDirection: "column", alignItems: "center", gap: 18, pointerEvents: "none", fontFamily: "monospace" }}>
-                <div style={{ fontSize: 13, letterSpacing: "0.18em", color: "rgba(180,230,255,0.85)", textTransform: "uppercase" }}>
+            <div style={{ position: "relative", zIndex: 2, display: "flex", flexDirection: "column", alignItems: "center", gap: 18, pointerEvents: "none" }}>
+                {/* <div style={{ fontSize: 13, letterSpacing: "0.18em", color: "rgba(180,230,255,0.85)", textTransform: "uppercase" }}>
                     {labels[Math.min(labelIdx, labels.length - 1)]}
-                </div>
+                </div> */}
                 <div style={{ fontSize: 22, letterSpacing: "0.08em", color: "rgba(100,200,255,0.9)" }}>
                     {Math.round(progress)}%
                 </div>
-                <div style={{ width: 160, height: 2, background: "rgba(255,255,255,0.08)", borderRadius: 2, overflow: "hidden" }}>
+                {/* <div style={{ width: 160, height: 2, background: "rgba(255,255,255,0.08)", borderRadius: 2, overflow: "hidden" }}>
                     <div style={{ height: "100%", width: `${progress}%`, background: "rgba(80,200,255,0.8)", transition: "width 0.1s linear" }} />
-                </div>
+                </div> */}
             </div>
         </div>
     )

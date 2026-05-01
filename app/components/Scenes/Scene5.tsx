@@ -17,7 +17,7 @@ export default function Scene5() {
   const [active, setActive] = useState<number | null>(2) // center default
 
   return (
-    <section className="relative h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative h-screen flex items-center justify-center overflow-hidden bg-black">
       <div className="absolute inset-0 -top-90 -z-10 opacity-5">
         <Lottie
           animationData={animationData}

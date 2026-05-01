@@ -1,6 +1,6 @@
 "use client"
 
-import { useGLTF, useEnvironment } from "@react-three/drei"
+import { useGLTF, useEnvironment, Text } from "@react-three/drei"
 import { useFrame } from "@react-three/fiber"
 import { useLayoutEffect, useRef, useState, useEffect, useMemo } from "react"
 import * as THREE from "three"
@@ -363,153 +363,111 @@ function RandomParticles() {
   )
 }
 
-// function Jelly() {
-//   const { scene } = useGLTF("/models/assets/jelly.glb")
-//   const groupRef = useRef<THREE.Group>(null!)
+function Jelly() {
+  const { scene } = useGLTF("/models/assets/jelly.glb")
+  const group = useRef<THREE.Group>(null!)
+  const lightRef = useRef<THREE.PointLight>(null!)
 
-//   // Animation state
-//   const stateRef = useRef({
-//     isAnimating: false,
-//     progress: 0, // 0 to 1 (bottom to top)
-//     targetX: 0,
-//     startY: -3,
-//     endY: 3,
-//   })
+  const state = useRef({
+    t: Math.random() * 100,
+    speed: 0.2 + Math.random() * 0.2,
+    driftX: (Math.random() - 0.5) * 2,
+    driftZ: (Math.random() - 0.5) * 2,
+  })
 
-//   useLayoutEffect(() => {
-//     const jellyMat = new THREE.MeshPhysicalMaterial({
-//       color: new THREE.Color("#ff77aa"),
-//       roughness: 0.5,
-//       metalness: 0.3,
-//       transmission: 0.8,
-//       thickness: 0.5,
-//       ior: 1.3,
-//       transparent: true,
-//       opacity: 0,
-//       depthWrite: false,
-//       side: THREE.DoubleSide,
-//       envMapIntensity: 1.0,
-//     })
-//     scene.traverse((child: any) => {
-//       if (!child.isMesh) return
-//       child.material = jellyMat
-//       child.renderOrder = 4
-//       child.castShadow = false
-//       child.receiveShadow = false
-//     })
-//   }, [scene])
+  const glassMaterial = useMemo(() => new THREE.MeshPhysicalMaterial({
+    color: "#000",
+    transmission: 1,
+    thickness: 1.2,
+    roughness: 0.05,
+    ior: 1.5, // Slightly higher for better refraction
+    transparent: true,
+    opacity: 0.25,
+    depthWrite: false,
+    envMapIntensity: 2,
+  }), []);
 
-//   useEffect(() => {
-//     // Start animation loop
-//     const animateJelly = () => {
-//       const state = stateRef.current
-
-//       if (!state.isAnimating) {
-//         // Start new animation with random X position
-//         state.isAnimating = true
-//         state.progress = 0
-//         state.targetX = (Math.random() - 0.5) * 8 // Random X between -4 and 4
-//         state.startY = -3
-//         state.endY = 3
-//       }
-
-//       if (state.isAnimating) {
-//         // Update progress
-//         state.progress += 0.008 // Speed of animation
-
-//         if (state.progress >= 1) {
-//           // Animation complete, reset
-//           state.isAnimating = false
-//           state.progress = 0
-
-//           // Update material opacity to fully transparent
-//           if (groupRef.current) {
-//             groupRef.current.traverse((child: any) => {
-//               if (child.isMesh && child.material) {
-//                 child.material.opacity = 0
-//               }
-//             })
-//           }
-
-//           // Schedule next animation after random delay (1-3 seconds)
-//           const delay = 1000 + Math.random() * 2000
-//           setTimeout(() => {
-//             if (!state.isAnimating) {
-//               animateJelly()
-//             }
-//           }, delay)
-//           return
-//         }
-
-//         // Calculate current Y position (easing for smoother motion)
-//         const easeInOut = state.progress < 0.5
-//           ? 2 * state.progress * state.progress
-//           : 1 - Math.pow(-2 * state.progress + 2, 2) / 2
-
-//         const currentY = state.startY + (state.endY - state.startY) * easeInOut
-
-//         // Calculate opacity (fade in at start, fade out at end)
-//         let opacity = 0
-//         if (state.progress < 0.2) {
-//           // Fade in during first 20%
-//           opacity = state.progress / 0.2
-//         } else if (state.progress > 0.8) {
-//           // Fade out during last 20%
-//           opacity = 1 - ((state.progress - 0.8) / 0.2)
-//         } else {
-//           // Full opacity in middle
-//           opacity = 1
-//         }
-
-//         // Apply opacity to material
-//         if (groupRef.current) {
-//           groupRef.current.traverse((child: any) => {
-//             if (child.isMesh && child.material) {
-//               child.material.opacity = opacity * 0.9
-//               // Slight color shift based on progress
-//               const hue = 0.95 + easeInOut * 0.1 // Shift from pink to slightly redder
-//               child.material.color.setHSL(hue, 1, 0.6)
-//             }
-//           })
-//         }
-
-//         // Update position
-//         if (groupRef.current) {
-//           groupRef.current.position.x = state.targetX
-//           groupRef.current.position.y = currentY
-//           groupRef.current.rotation.y = Math.sin(Date.now() * 0.003) * 1
-//           groupRef.current.rotation.x = Math.sin(Date.now() * 0.004) * 0.05
-//         }
-//       }
-//     }
-
-//     // Start the first animation after a short delay
-//     const timeout = setTimeout(() => {
-//       animateJelly()
-//     }, 500)
-
-//     // Set up interval for continuous animation checks
-//     const interval = setInterval(() => {
-//       const state = stateRef.current
-//       if (state.isAnimating) {
-//         animateJelly()
-//       }
-//     }, 16) // ~60fps
-
-//     return () => {
-//       clearTimeout(timeout)
-//       clearInterval(interval)
-//     }
-//   }, [])
-
-//   return (
-//     <group ref={groupRef} position={[0, -3, 0]}>
-//       <primitive object={scene} scale={0.001} />
-//     </group>
-//   )
-// }
+  useLayoutEffect(() => {
+    scene.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.material = glassMaterial;
+        child.renderOrder = 5;
+      }
+    });
+  }, [scene, glassMaterial]);
 
 
+  useFrame(({ camera }, delta) => {
+    const s = state.current
+    s.t += delta * s.speed
+
+    if (!group.current) return
+    const g = group.current
+
+    // ─── PULSE ─────────────────────────────
+    const pulse = Math.sin(s.t * 3)
+    const contract = Math.max(0, pulse)
+
+    // ─── SCALE ─────────────────────────────
+    const squash = 1 - contract * 0.05
+    const stretch = 1 + contract * 0.35
+
+    g.scale.set(stretch, squash, stretch)
+
+    // ─── MOVEMENT ──────────────────────────
+    const thrust = contract * 1.2
+
+    g.position.y += thrust * delta
+    g.position.y -= 0.18 * delta
+
+    if (g.position.y > 3) g.position.y = -3
+
+    g.position.x += Math.sin(s.t * 0.5) * 0.002
+    g.position.z += Math.cos(s.t * 0.4) * 0.002
+
+    // ─── ROTATION (FIXED SYSTEM) ───────────
+    const baseRotX = 0.1
+    const baseRotY = 1
+
+    const tiltUp = contract * 0.6
+    const wobbleX = Math.sin(s.t * 0.8) * 0.08
+    const wobbleY = Math.sin(s.t * 0.6) * 0.15
+
+    const rotX = baseRotX - tiltUp + wobbleX
+    const rotY = baseRotY + wobbleY
+
+    const localQuat = new THREE.Quaternion().setFromEuler(
+      new THREE.Euler(rotX, rotY, 0)
+    )
+
+    g.quaternion.copy(camera.quaternion).multiply(localQuat)
+
+    // ─── LIGHT ─────────────────────────────
+    if (lightRef.current) {
+      lightRef.current.intensity = 1.2 + contract * 4
+      lightRef.current.distance = 2 + contract * 2
+    }
+  })
+
+  return (
+    <group ref={group} position={[4, 2, 0]}>
+
+      {/* FIX ORIENTATION HERE */}
+      <group rotation={[Math.PI / 2, 0, 0]}>
+        <primitive object={scene} scale={0.002} />
+      </group>
+
+      <pointLight
+        ref={lightRef}
+        color="#ffffff"
+        intensity={2}
+        distance={3}
+        decay={2}
+        position={[0, 0, 0]}
+      />
+    </group>
+  )
+}
 
 // ─── Model ────────────────────────────────────────────────────────────────────
 function Model(props: any) {
@@ -612,6 +570,50 @@ function Wire() {
   )
 }
 
+function useScrollProgress(max = 1000) {
+  const [progress, setProgress] = useState(0)
+
+  useEffect(() => {
+    const onScroll = () => {
+      const p = Math.min(window.scrollY / max, 1)
+      setProgress(p)
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true })
+    onScroll()
+
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [max])
+
+  return progress
+}
+
+function ScrollText() {
+  const progress = useScrollProgress(800)
+
+  // 🔥 kill it after threshold
+  if (progress >= 0.4) return null
+
+  const opacity = 0.4 - progress
+  const y = progress * 1.5
+
+  return (
+    <group position={[0, 0.75 + y, 0]}>
+      <Text
+        font="/fonts/CrystalRegular.ttf"
+        fontSize={0.06}
+        color="#8fd3ff"
+        anchorX="center"
+        anchorY="middle"
+        fillOpacity={opacity}
+        letterSpacing={0.1}
+      >
+        SCROLL DOWN
+      </Text>
+    </group>
+  )
+}
+
 // ─── Scene ────────────────────────────────────────────────────────────────────
 export default function Scene1() {
   const logoVisible = useScrollVisible(1500)  // false when scrollY ≥ 1000px
@@ -621,8 +623,10 @@ export default function Scene1() {
       <RandomParticles />
       <Nature />
       <FogVolume />
-      {/* <Jelly /> */}
-      {/* Unmounted entirely when scrolled past 1000px — zero GPU cost */}
+      <Jelly />
+
+      <ScrollText />
+
       {logoVisible && (
         <group position={[0, 0, 0]}>
           <Model rotation={[0, Math.PI, 0]} />

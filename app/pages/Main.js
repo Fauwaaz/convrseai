@@ -170,7 +170,7 @@ export default function Main() {
 
   return (
     <>
-      <div
+      {/* <div
         style={{
           position: "fixed",
           inset: 0, // replaces top/left/width/height
@@ -188,7 +188,7 @@ export default function Main() {
         <video autoPlay loop muted playsInline>
           <source src="/video/video1.webm" type="video/webm" />
         </video>
-      </div>
+      </div> */}
       <div
         style={{
           position: "fixed",
